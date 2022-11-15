@@ -1,8 +1,12 @@
 package pg
 
-import "context"
+import (
+	"context"
 
-func SelectTotal(ctx context.Context, dest *int, q SelectQuery) (err error) {
+	"github.com/jackc/pgx/v5/pgxpool"
+)
+
+func SelectTotal(ctx context.Context, db *pgxpool.Pool, dest *int, q SelectQuery) (err error) {
 	q.GroupBy = nil
 	q.Limit = 0
 	q.Offset = 0

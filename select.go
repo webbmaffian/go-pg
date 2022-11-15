@@ -10,7 +10,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func Select(ctx context.Context, dest any, q SelectQuery, options ...SelectOptions) (err error) {
+func Select(ctx context.Context, db *pgxpool.Pool, dest any, q SelectQuery, options ...SelectOptions) (err error) {
 	var opt SelectOptions
 
 	if len(options) != 0 {

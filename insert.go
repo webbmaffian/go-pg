@@ -4,9 +4,11 @@ import (
 	"context"
 	"reflect"
 	"strings"
+
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func Insert(ctx context.Context, table string, src any, onConflict ...OnConflictUpdate) (err error) {
+func Insert(ctx context.Context, db *pgxpool.Pool, table string, src any, onConflict ...OnConflictUpdate) (err error) {
 	var b strings.Builder
 	b.Grow(200)
 
