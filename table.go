@@ -4,20 +4,21 @@ import (
 	"context"
 	"strings"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func Table(db *pgxpool.Pool, name string) TableSource {
-	return TableSource{db, name}
+func Table(db *pgxpool.Pool, name ...string) TableSource {
+	return TableSource{db, pgx.Identifier(name)}
 }
 
 type TableSource struct {
-	db   *pgxpool.Pool
-	name string
+	db         *pgxpool.Pool
+	identifier pgx.Identifier
 }
 
 func (t TableSource) buildQuery(b *strings.Builder, args *[]any) {
-	writeIdentifier(b, t.name)
+	b.WriteString(t.identifier.Sanitize())
 }
 
 func (t TableSource) Select(ctx context.Context, dest any, q SelectQuery, options ...SelectOptions) error {
@@ -45,13 +46,62 @@ func (t TableSource) IterateRaw(ctx context.Context, q SelectQuery, iterator fun
 }
 
 func (t TableSource) Insert(ctx context.Context, src any, onConflict ...OnConflictUpdate) error {
-	return Insert(ctx, t.db, t.name, src, onConflict...)
+	return Insert(ctx, t.db, t, src, onConflict...)
 }
 
 func (t TableSource) Update(ctx context.Context, src any, condition Condition) error {
-	return Update(ctx, t.db, t.name, src, condition)
+	return Update(ctx, t.db, t, src, condition)
 }
 
 func (t TableSource) Delete(ctx context.Context, condition Condition) error {
-	return Delete(ctx, t.db, t.name, condition)
+	return Delete(ctx, t.db, t, condition)
+}
+
+// Presumes that there is a scheme with the same name as the table.
+func (t TableSource) Partition(partition string) TableSource {
+	return TableSource{
+		db:         t.db,
+		identifier: append(t.identifier, partition),
+	}
+}
+
+func (t TableSource) Truncate(ctx context.Context) (err error) {
+	return TruncateTable(ctx, t.db, t.identifier)
+}
+
+func (t TableSource) Drop(ctx context.Context) (err error) {
+	return DropTable(ctx, t.db, t.identifier)
+}
+
+// Presumes that there is a scheme with the same name as the table, and that the partition value is a string.
+func (t TableSource) CreatePartition(ctx context.Context, partition string) (err error) {
+	return CreatePartition(ctx, t.db, t.identifier, append(t.identifier, partition), partition)
+}
+
+func (t TableSource) CopyFrom(ctx context.Context, columnsNames []string, rowSrc pgx.CopyFromSource) (int64, error) {
+	return t.db.CopyFrom(ctx, t.identifier, columnsNames, rowSrc)
+}
+
+func TruncateTable(ctx context.Context, db *pgxpool.Pool, table pgx.Identifier) (err error) {
+	var b strings.Builder
+	b.Grow(64)
+
+	b.WriteString("TRUNCATE TABLE ")
+	b.WriteString(table.Sanitize())
+
+	_, err = db.Exec(ctx, b.String())
+
+	return
+}
+
+func DropTable(ctx context.Context, db *pgxpool.Pool, table pgx.Identifier) (err error) {
+	var b strings.Builder
+	b.Grow(64)
+
+	b.WriteString("DROP TABLE ")
+	b.WriteString(table.Sanitize())
+
+	_, err = db.Exec(ctx, b.String())
+
+	return
 }

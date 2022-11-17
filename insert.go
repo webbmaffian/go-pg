@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func Insert(ctx context.Context, db *pgxpool.Pool, table string, src any, onConflict ...OnConflictUpdate) (err error) {
+func Insert(ctx context.Context, db *pgxpool.Pool, table TableSource, src any, onConflict ...OnConflictUpdate) (err error) {
 	var b strings.Builder
 	b.Grow(200)
 
@@ -19,7 +19,7 @@ func Insert(ctx context.Context, db *pgxpool.Pool, table string, src any, onConf
 	args := make([]any, 0, 10)
 
 	b.WriteString("INSERT INTO ")
-	writeIdentifier(&b, table)
+	table.buildQuery(&b, nil)
 	b.WriteByte(' ')
 
 	switch v := src.(type) {

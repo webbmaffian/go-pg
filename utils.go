@@ -77,3 +77,11 @@ func writeIdentifier(b *strings.Builder, identifiers ...string) {
 		b.WriteByte('"')
 	}
 }
+
+var stringReplacer = strings.NewReplacer("'", "", "\\", "")
+
+func writeString(b *strings.Builder, str string) {
+	b.WriteByte('\'')
+	stringReplacer.WriteString(b, str)
+	b.WriteByte('\'')
+}

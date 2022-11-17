@@ -139,8 +139,9 @@ func (c In) run(b *strings.Builder, args *[]any) {
 		v.query.buildQuery(b, args)
 		b.WriteByte(')')
 	default:
-		b.WriteString(" = ANY ")
+		b.WriteString(" = ANY (")
 		writeParam(b, args, c.Value)
+		b.WriteByte(')')
 	}
 
 	return
@@ -164,11 +165,10 @@ func (c NotIn) run(b *strings.Builder, args *[]any) {
 		v.query.buildQuery(b, args)
 		b.WriteByte(')')
 	default:
-		b.WriteString(" != ANY ")
+		b.WriteString(" != ANY (")
 		writeParam(b, args, c.Value)
+		b.WriteByte(')')
 	}
-
-	return
 }
 
 type Contains struct {
