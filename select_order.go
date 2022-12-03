@@ -22,6 +22,10 @@ func (o OrderBy) encodeOrderBy(b *strings.Builder) {
 }
 
 func Asc(cols ...any) OrderByColumnar {
+	if cols == nil {
+		return nil
+	}
+
 	columns := make(asc, len(cols))
 
 	for i := range cols {
@@ -56,6 +60,10 @@ func (o asc) encodeOrderBy(b *strings.Builder) {
 }
 
 func Desc(cols ...any) OrderByColumnar {
+	if cols == nil {
+		return nil
+	}
+
 	columns := make(desc, len(cols))
 
 	for i := range cols {

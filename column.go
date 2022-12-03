@@ -32,18 +32,22 @@ func (c column) encodeColumnIdentifier(b *strings.Builder) {
 }
 
 func (c column) encode(b *strings.Builder) {
-	if c.table != nil {
-		writeIdentifier(b, c.table.identifier...)
-		b.WriteByte('.')
-	}
-
 	l := len(c.path)
 
 	if l > 1 {
 		b.WriteByte('(')
+
+		if c.table != nil {
+			writeIdentifier(b, c.table.identifier...)
+			b.WriteByte('.')
+		}
+
 		writeIdentifier(b, c.path[0])
 		b.WriteString(").")
 		c.path = c.path[1:]
+	} else if c.table != nil {
+		writeIdentifier(b, c.table.identifier...)
+		b.WriteByte('.')
 	}
 
 	writeIdentifier(b, c.path...)
