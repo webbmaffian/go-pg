@@ -27,7 +27,7 @@ func Asc(cols ...any) OrderByColumnar {
 	for i := range cols {
 		switch c := cols[i].(type) {
 
-		case AliasedColumnar:
+		case Columnar:
 			columns[i] = c
 
 		case string:
@@ -38,7 +38,7 @@ func Asc(cols ...any) OrderByColumnar {
 	return columns
 }
 
-type asc []AliasedColumnar
+type asc []Columnar
 
 func (o asc) encodeOrderBy(b *strings.Builder) {
 	if len(o) == 0 {
@@ -61,7 +61,7 @@ func Desc(cols ...any) OrderByColumnar {
 	for i := range cols {
 		switch c := cols[i].(type) {
 
-		case AliasedColumnar:
+		case Columnar:
 			columns[i] = c
 
 		case string:
@@ -72,7 +72,7 @@ func Desc(cols ...any) OrderByColumnar {
 	return columns
 }
 
-type desc []AliasedColumnar
+type desc []Columnar
 
 func (o desc) encodeOrderBy(b *strings.Builder) {
 	if len(o) == 0 {

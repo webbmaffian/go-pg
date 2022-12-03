@@ -18,7 +18,7 @@ type SelectQuery struct {
 	From    queryable
 	Join    join
 	Where   Condition
-	GroupBy AliasedColumnar
+	GroupBy Columnar
 	Having  Condition
 	OrderBy OrderByColumnar
 	Limit   int

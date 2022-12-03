@@ -8,7 +8,7 @@ func Any(column any, value any) Condition {
 	}
 
 	switch v := column.(type) {
-	case AliasedColumnar:
+	case Columnar:
 		c.column = v
 	case string:
 		c.column = Column(v)
@@ -22,7 +22,7 @@ func Some(column any, value any) Condition {
 }
 
 type some struct {
-	column AliasedColumnar
+	column Columnar
 	value  any
 }
 
@@ -31,6 +31,4 @@ func (c some) encodeCondition(b *strings.Builder, args *[]any) {
 	b.WriteString(" = ANY (")
 	c.column.encodeColumnIdentifier(b)
 	b.WriteByte(')')
-
-	return
 }

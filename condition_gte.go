@@ -8,7 +8,7 @@ func Gte(column any, value any) Condition {
 	}
 
 	switch v := column.(type) {
-	case AliasedColumnar:
+	case Columnar:
 		c.column = v
 	case string:
 		c.column = Column(v)
@@ -18,7 +18,7 @@ func Gte(column any, value any) Condition {
 }
 
 type gte struct {
-	column AliasedColumnar
+	column Columnar
 	value  any
 }
 

@@ -39,6 +39,19 @@ func (c columns) encodeColumn(b *strings.Builder) {
 	}
 }
 
+func (c columns) encodeColumnIdentifier(b *strings.Builder) {
+	if c == nil {
+		return
+	}
+
+	c[0].encodeColumnIdentifier(b)
+
+	for _, v := range c[1:] {
+		b.WriteString(", ")
+		v.encodeColumnIdentifier(b)
+	}
+}
+
 func (c columns) has(col string) bool {
 	for _, column := range c {
 		if column.has(col) {

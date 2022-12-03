@@ -26,13 +26,13 @@ type IsZeroer interface {
 
 type Columnar interface {
 	encodeColumn(b *strings.Builder)
+	encodeColumnIdentifier(b *strings.Builder)
 	has(col string) bool
 }
 
 type AliasedColumnar interface {
 	Columnar
 	Alias(string) AliasedColumnar
-	encodeColumnIdentifier(b *strings.Builder)
 }
 
 type MultiColumnar interface {

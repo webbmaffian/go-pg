@@ -82,14 +82,14 @@ func (t TableSource) CopyFrom(ctx context.Context, columnsNames []string, rowSrc
 	return t.db.CopyFrom(ctx, t.identifier, columnsNames, rowSrc)
 }
 
-func (t *TableSource) Column(path ...string) AliasedColumnar {
+func (t *TableSource) Column(path ...string) Columnar {
 	return column{
 		path:  path,
 		table: t,
 	}
 }
 
-func (t *TableSource) JsonColumn(path ...string) AliasedColumnar {
+func (t *TableSource) JsonColumn(path ...string) Columnar {
 	return jsonColumn{
 		path:  path,
 		table: t,
