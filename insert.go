@@ -8,7 +8,7 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func Insert(ctx context.Context, db *pgxpool.Pool, table TableSource, src any, onConflict ...OnConflictUpdate) (err error) {
+func Insert(ctx context.Context, db *pgxpool.Pool, table TableSource, src any, onConflict ...ConflictAction) (err error) {
 	var b strings.Builder
 	b.Grow(200)
 
@@ -62,7 +62,7 @@ func Insert(ctx context.Context, db *pgxpool.Pool, table TableSource, src any, o
 	b.WriteString(values.String())
 
 	if len(onConflict) > 0 {
-		if err = onConflict[0].run(&b, keys); err != nil {
+		if err = onConflict[0].encodeConflictHandler(&b, keys, &args); err != nil {
 			return
 		}
 	}

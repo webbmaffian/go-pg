@@ -45,7 +45,7 @@ func (t TableSource) IterateRaw(ctx context.Context, q SelectQuery, iterator fun
 	return IterateRaw(ctx, t.db, q, iterator)
 }
 
-func (t TableSource) Insert(ctx context.Context, src any, onConflict ...OnConflictUpdate) error {
+func (t TableSource) Insert(ctx context.Context, src any, onConflict ...ConflictAction) error {
 	return Insert(ctx, t.db, t, src, onConflict...)
 }
 

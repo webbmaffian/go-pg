@@ -4,22 +4,38 @@ import (
 	"strings"
 )
 
-type OnConflictUpdate []string
+type ConflictTarget interface {
+	Update(where ...Condition) ConflictAction
+}
 
-func (conflictingColumns OnConflictUpdate) run(b *strings.Builder, columns []string) (err error) {
+type ConflictAction interface {
+	encodeConflictHandler(b *strings.Builder, columns []string, args *[]any) error
+}
+
+func OnConflict(conflictingColumns ...any) ConflictTarget {
+	return onConflict{
+		conflictingColumns: Columns(conflictingColumns...),
+	}
+}
+
+type onConflict struct {
+	conflictingColumns Columnar
+	targetCondition    Condition
+}
+
+func (c onConflict) Update(where ...Condition) ConflictAction {
+	c.targetCondition = And(where)
+	return c
+}
+
+func (c onConflict) encodeConflictHandler(b *strings.Builder, columns []string, args *[]any) (err error) {
 	if len(columns) == 0 {
 		return
 	}
 
 	b.WriteByte('\n')
 	b.WriteString("ON CONFLICT (")
-	writeIdentifier(b, conflictingColumns[0])
-
-	for _, column := range conflictingColumns[1:] {
-		b.WriteString(", ")
-		writeIdentifier(b, column)
-	}
-
+	c.conflictingColumns.encodeColumnIdentifier(b)
 	b.WriteString(") DO UPDATE SET ")
 
 	first := true
@@ -32,8 +48,13 @@ func (conflictingColumns OnConflictUpdate) run(b *strings.Builder, columns []str
 		}
 
 		writeIdentifier(b, column)
-		b.WriteString(" = excluded.")
+		b.WriteString(" = EXCLUDED.")
 		writeIdentifier(b, column)
+	}
+
+	if c.targetCondition != nil {
+		b.WriteString("WHERE ")
+		c.targetCondition.encodeCondition(b, args)
 	}
 
 	return
