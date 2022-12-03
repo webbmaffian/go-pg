@@ -35,6 +35,11 @@ type AliasedColumnar interface {
 	encodeColumnIdentifier(b *strings.Builder)
 }
 
+type MultiColumnar interface {
+	Columnar
+	Append(...Columnar) MultiColumnar
+}
+
 type Condition interface {
 	encodeCondition(b *strings.Builder, args *[]any)
 }

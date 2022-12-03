@@ -2,7 +2,7 @@ package pg
 
 import "strings"
 
-func Columns(cols ...any) Columnar {
+func Columns(cols ...any) MultiColumnar {
 	realCols := make(columns, len(cols))
 
 	for i := range cols {
@@ -21,6 +21,10 @@ func Columns(cols ...any) Columnar {
 }
 
 type columns []Columnar
+
+func (c columns) Append(cols ...Columnar) MultiColumnar {
+	return append(c, cols...)
+}
 
 func (c columns) encodeColumn(b *strings.Builder) {
 	if c == nil {
