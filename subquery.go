@@ -11,9 +11,9 @@ type SubquerySource struct {
 	query SelectQuery
 }
 
-func (t SubquerySource) buildQuery(b *strings.Builder, args *[]any) {
+func (t SubquerySource) encodeQuery(b *strings.Builder, args *[]any) {
 	b.WriteByte('(')
-	t.query.buildQuery(b, args)
+	t.query.encodeQuery(b, args)
 	b.WriteByte(')')
 	b.WriteString(" AS ")
 	writeIdentifier(b, t.alias)

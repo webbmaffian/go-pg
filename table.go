@@ -17,7 +17,7 @@ type TableSource struct {
 	identifier pgx.Identifier
 }
 
-func (t TableSource) buildQuery(b *strings.Builder, args *[]any) {
+func (t TableSource) encodeQuery(b *strings.Builder, args *[]any) {
 	b.WriteString(t.identifier.Sanitize())
 }
 
@@ -80,6 +80,20 @@ func (t TableSource) CreatePartition(ctx context.Context, partition string) (err
 
 func (t TableSource) CopyFrom(ctx context.Context, columnsNames []string, rowSrc pgx.CopyFromSource) (int64, error) {
 	return t.db.CopyFrom(ctx, t.identifier, columnsNames, rowSrc)
+}
+
+func (t *TableSource) Column(path ...string) AliasedColumnar {
+	return column{
+		path:  path,
+		table: t,
+	}
+}
+
+func (t *TableSource) JsonColumn(path ...string) AliasedColumnar {
+	return jsonColumn{
+		path:  path,
+		table: t,
+	}
 }
 
 func TruncateTable(ctx context.Context, db *pgxpool.Pool, table pgx.Identifier) (err error) {

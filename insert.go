@@ -19,7 +19,7 @@ func Insert(ctx context.Context, db *pgxpool.Pool, table TableSource, src any, o
 	args := make([]any, 0, 10)
 
 	b.WriteString("INSERT INTO ")
-	table.buildQuery(&b, nil)
+	table.encodeQuery(&b, nil)
 	b.WriteByte(' ')
 
 	switch v := src.(type) {

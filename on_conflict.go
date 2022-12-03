@@ -25,10 +25,6 @@ func (conflictingColumns OnConflictUpdate) run(b *strings.Builder, columns []str
 	first := true
 
 	for _, column := range columns {
-		if containsPrefix(conflictingColumns, column) {
-			continue
-		}
-
 		if first {
 			first = false
 		} else {
@@ -41,16 +37,4 @@ func (conflictingColumns OnConflictUpdate) run(b *strings.Builder, columns []str
 	}
 
 	return
-}
-
-func containsPrefix(haystack []string, needle string) bool {
-	for _, s := range haystack {
-		s, _, _ = strings.Cut(s, "[")
-
-		if s == needle {
-			return true
-		}
-	}
-
-	return false
 }

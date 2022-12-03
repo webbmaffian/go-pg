@@ -46,7 +46,7 @@ func Select(ctx context.Context, db *pgxpool.Pool, dest any, q SelectQuery, opti
 }
 
 func selectOneIntoStruct(ctx context.Context, val reflect.Value, q *SelectQuery, db *pgxpool.Pool) (err error) {
-	var selectedFields Column
+	var selectedFields Columns
 
 	elem := val.Elem()
 	typ := elem.Type()
@@ -55,7 +55,7 @@ func selectOneIntoStruct(ctx context.Context, val reflect.Value, q *SelectQuery,
 	q.Limit = 1
 
 	if q.Select == nil {
-		selectedFields = make(Column, 0, 10)
+		selectedFields = make(Columns, 0, 10)
 	}
 
 	for i := 0; i < numFields; i++ {
@@ -73,7 +73,7 @@ func selectOneIntoStruct(ctx context.Context, val reflect.Value, q *SelectQuery,
 		}
 
 		if q.Select == nil || q.Select.has(col) {
-			selectedFields = append(selectedFields, col)
+			selectedFields = append(selectedFields, Column(col))
 			destProps = append(destProps, f.Addr().Interface())
 		}
 	}
@@ -109,18 +109,12 @@ func selectOneIntoStruct(ctx context.Context, val reflect.Value, q *SelectQuery,
 }
 
 func selectIntoSlice(ctx context.Context, dest reflect.Value, q *SelectQuery, db *pgxpool.Pool) (err error) {
-	var selectedFields Column
-
 	destVal := dest.Elem()
 	val := reflect.New(destVal.Type().Elem())
 	elem := val.Elem()
 	typ := elem.Type()
 	numFields := elem.NumField()
 	destProps := make([]any, 0, numFields)
-
-	if q.Select == nil {
-		selectedFields = make(Column, 0, 10)
-	}
 
 	for i := 0; i < numFields; i++ {
 		f := elem.Field(i)
@@ -137,7 +131,6 @@ func selectIntoSlice(ctx context.Context, dest reflect.Value, q *SelectQuery, db
 		}
 
 		if q.Select == nil || q.Select.has(col) {
-			selectedFields = append(selectedFields, col)
 			destProps = append(destProps, f.Addr().Interface())
 		}
 	}

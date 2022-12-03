@@ -10,15 +10,15 @@ import (
 )
 
 type queryable interface {
-	buildQuery(b *strings.Builder, args *[]any)
+	encodeQuery(b *strings.Builder, args *[]any)
 }
 
 type SelectQuery struct {
-	Select  columns
+	Select  Columnar
 	From    queryable
 	Join    join
 	Where   Condition
-	GroupBy columns
+	GroupBy AliasedColumnar
 	Having  Condition
 	OrderBy orderBy
 	Limit   int
@@ -39,50 +39,50 @@ func (q *SelectQuery) Error() error {
 
 func (q *SelectQuery) String() string {
 	var b strings.Builder
-	q.buildQuery(&b, &[]any{})
+	q.encodeQuery(&b, &[]any{})
 	return b.String()
 }
 
-func (q *SelectQuery) buildQuery(b *strings.Builder, args *[]any) {
+func (q *SelectQuery) encodeQuery(b *strings.Builder, args *[]any) {
 	b.Grow(300)
 
 	if q.Select != nil {
 		b.WriteString("SELECT ")
-		q.Select.writeColumns(b)
+		q.Select.encodeColumn(b)
 		b.WriteByte('\n')
 	}
 
 	if q.From != nil {
 		b.WriteString("FROM ")
-		q.From.buildQuery(b, args)
+		q.From.encodeQuery(b, args)
 		b.WriteByte('\n')
 	}
 
 	if q.Join != nil {
-		q.Join.runJoin(b, args)
+		q.Join.encodeJoin(b, args)
 	}
 
 	if q.Where != nil {
 		b.WriteString("WHERE ")
-		q.Where.run(b, args)
+		q.Where.encodeCondition(b, args)
 		b.WriteByte('\n')
 	}
 
 	if q.GroupBy != nil {
 		b.WriteString("GROUP BY ")
-		q.GroupBy.writeColumns(b)
+		q.GroupBy.encodeColumnIdentifier(b)
 		b.WriteByte('\n')
 	}
 
 	if q.Having != nil {
 		b.WriteString("HAVING ")
-		q.Having.run(b, args)
+		q.Having.encodeCondition(b, args)
 		b.WriteByte('\n')
 	}
 
 	if q.OrderBy != nil {
 		b.WriteString("ORDER BY ")
-		q.OrderBy.orderBy(b)
+		q.OrderBy.encodeOrderBy(b)
 		b.WriteByte('\n')
 	}
 
@@ -102,7 +102,7 @@ func (q *SelectQuery) buildQuery(b *strings.Builder, args *[]any) {
 func (q *SelectQuery) run(ctx context.Context, db *pgxpool.Pool) (err error) {
 	var b strings.Builder
 	args := make([]any, 0, 5)
-	q.buildQuery(&b, &args)
+	q.encodeQuery(&b, &args)
 
 	q.result, err = db.Query(ctx, q.String(), args...)
 

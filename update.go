@@ -14,7 +14,7 @@ func Update(ctx context.Context, db *pgxpool.Pool, table TableSource, src any, c
 	args := make([]any, 0, 10)
 
 	b.WriteString("UPDATE ")
-	table.buildQuery(&b, nil)
+	table.encodeQuery(&b, nil)
 	b.WriteString(" SET ")
 
 	switch v := src.(type) {
@@ -53,7 +53,7 @@ func Update(ctx context.Context, db *pgxpool.Pool, table TableSource, src any, c
 
 	b.WriteByte('\n')
 	b.WriteString("WHERE ")
-	condition.run(&b, &args)
+	condition.encodeCondition(&b, &args)
 
 	_, err = db.Exec(ctx, b.String(), args...)
 

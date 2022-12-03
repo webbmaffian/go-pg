@@ -13,10 +13,10 @@ func Delete(ctx context.Context, db *pgxpool.Pool, table TableSource, condition 
 	args := make([]any, 0, 2)
 
 	b.WriteString("DELETE FROM ")
-	table.buildQuery(&b, nil)
+	table.encodeQuery(&b, nil)
 	b.WriteByte('\n')
 	b.WriteString("WHERE ")
-	condition.run(&b, &args)
+	condition.encodeCondition(&b, &args)
 
 	_, err = db.Exec(ctx, b.String(), args...)
 

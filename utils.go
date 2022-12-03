@@ -69,7 +69,7 @@ func writeIdentifier(b *strings.Builder, identifiers ...string) {
 		if first {
 			first = false
 		} else {
-			b.WriteString(", ")
+			b.WriteByte('.')
 		}
 
 		b.WriteByte('"')

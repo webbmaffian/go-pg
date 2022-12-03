@@ -1,6 +1,9 @@
 package pg
 
-import "context"
+import (
+	"context"
+	"strings"
+)
 
 type MutationType uint8
 
@@ -19,4 +22,19 @@ type AfterMutation interface {
 
 type IsZeroer interface {
 	IsZero() bool
+}
+
+type Columnar interface {
+	encodeColumn(b *strings.Builder)
+	has(col string) bool
+}
+
+type AliasedColumnar interface {
+	Columnar
+	Alias(string) AliasedColumnar
+	encodeColumnIdentifier(b *strings.Builder)
+}
+
+type Condition interface {
+	encodeCondition(b *strings.Builder, args *[]any)
 }
