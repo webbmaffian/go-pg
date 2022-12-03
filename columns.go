@@ -2,9 +2,27 @@ package pg
 
 import "strings"
 
-type Columns []Columnar
+func Columns(cols ...any) Columnar {
+	realCols := make(columns, len(cols))
 
-func (c Columns) encodeColumn(b *strings.Builder) {
+	for i := range cols {
+		switch c := cols[i].(type) {
+
+		case Columnar:
+			realCols[i] = c
+
+		case string:
+			realCols[i] = Column(c)
+		}
+
+	}
+
+	return realCols
+}
+
+type columns []Columnar
+
+func (c columns) encodeColumn(b *strings.Builder) {
 	if c == nil {
 		return
 	}
@@ -17,7 +35,7 @@ func (c Columns) encodeColumn(b *strings.Builder) {
 	}
 }
 
-func (c Columns) has(col string) bool {
+func (c columns) has(col string) bool {
 	for _, column := range c {
 		if column.has(col) {
 			return true
