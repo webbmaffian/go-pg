@@ -2,11 +2,11 @@ package pg
 
 import "strings"
 
-type join interface {
+type Join interface {
 	encodeJoin(b *strings.Builder, args *[]any)
 }
 
-type Joins []join
+type Joins []Join
 
 func (j Joins) encodeJoin(b *strings.Builder, args *[]any) {
 	for _, join := range j {
@@ -14,45 +14,49 @@ func (j Joins) encodeJoin(b *strings.Builder, args *[]any) {
 	}
 }
 
-type InnerJoin struct {
-	Table     queryable
-	Condition Condition
+func InnerJoin(table Queryable, condition Condition) Join {
+	return join{
+		joinType:  "INNER JOIN",
+		table:     table,
+		condition: condition,
+	}
 }
 
-func (j InnerJoin) encodeJoin(b *strings.Builder, args *[]any) {
-	b.WriteString("INNER JOIN ")
-	j.Table.encodeQuery(b, args)
-	b.WriteString(" ON ")
-	j.Condition.encodeCondition(b, args)
-	b.WriteByte('\n')
+func OuterJoin(table Queryable, condition Condition) Join {
+	return join{
+		joinType:  "OUTER JOIN",
+		table:     table,
+		condition: condition,
+	}
 }
 
-type OuterJoin InnerJoin
-
-func (j OuterJoin) encodeJoin(b *strings.Builder, args *[]any) {
-	b.WriteString("OUTER JOIN ")
-	j.Table.encodeQuery(b, args)
-	b.WriteString(" ON ")
-	j.Condition.encodeCondition(b, args)
-	b.WriteByte('\n')
+func LeftJoin(table Queryable, condition Condition) Join {
+	return join{
+		joinType:  "LEFT JOIN",
+		table:     table,
+		condition: condition,
+	}
 }
 
-type LeftJoin InnerJoin
-
-func (j LeftJoin) encodeJoin(b *strings.Builder, args *[]any) {
-	b.WriteString("LEFT JOIN ")
-	j.Table.encodeQuery(b, args)
-	b.WriteString(" ON ")
-	j.Condition.encodeCondition(b, args)
-	b.WriteByte('\n')
+func RightJoin(table Queryable, condition Condition) Join {
+	return join{
+		joinType:  "RIGHT JOIN",
+		table:     table,
+		condition: condition,
+	}
 }
 
-type RightJoin InnerJoin
+type join struct {
+	joinType  string
+	table     Queryable
+	condition Condition
+}
 
-func (j RightJoin) encodeJoin(b *strings.Builder, args *[]any) {
-	b.WriteString("RIGHT JOIN ")
-	j.Table.encodeQuery(b, args)
+func (j join) encodeJoin(b *strings.Builder, args *[]any) {
+	b.WriteString(j.joinType)
+	b.WriteByte(' ')
+	j.table.encodeQuery(b, args)
 	b.WriteString(" ON ")
-	j.Condition.encodeCondition(b, args)
+	j.condition.encodeCondition(b, args)
 	b.WriteByte('\n')
 }

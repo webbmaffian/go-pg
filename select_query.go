@@ -9,14 +9,10 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-type queryable interface {
-	encodeQuery(b *strings.Builder, args *[]any)
-}
-
 type SelectQuery struct {
 	Select  Columnar
-	From    queryable
-	Join    join
+	From    Queryable
+	Join    Join
 	Where   Condition
 	GroupBy Columnar
 	Having  Condition

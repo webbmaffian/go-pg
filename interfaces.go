@@ -43,3 +43,7 @@ type MultiColumnar interface {
 type Condition interface {
 	encodeCondition(b *strings.Builder, args *[]any)
 }
+
+type Queryable interface {
+	encodeQuery(b *strings.Builder, args *[]any)
+}
