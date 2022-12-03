@@ -11,7 +11,7 @@ func SelectTotal(ctx context.Context, db *pgxpool.Pool, dest *int, q SelectQuery
 	q.Limit = 0
 	q.Offset = 0
 	q.OrderBy = nil
-	q.Select = Count("count")
+	q.Select = Count().Alias("count")
 
 	err = q.run(ctx, db)
 
