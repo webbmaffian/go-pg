@@ -53,9 +53,13 @@ func writeInt[T int | int8 | int16 | int32 | int64 | uint | uint8 | uint16 | uin
 }
 
 func writeParam(b *strings.Builder, args *[]any, value any) {
-	*args = append(*args, value)
-	b.WriteByte('$')
-	writeInt(b, len(*args))
+	if col, ok := value.(Columnar); ok {
+		col.encodeColumnIdentifier(b)
+	} else {
+		*args = append(*args, value)
+		b.WriteByte('$')
+		writeInt(b, len(*args))
+	}
 }
 
 func writeIdentifier(b *strings.Builder, identifiers ...string) {
