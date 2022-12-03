@@ -2,11 +2,11 @@ package pg
 
 import "strings"
 
-type orderBy interface {
+type OrderByColumnar interface {
 	encodeOrderBy(b *strings.Builder)
 }
 
-type OrderBy []orderBy
+type OrderBy []OrderByColumnar
 
 func (o OrderBy) encodeOrderBy(b *strings.Builder) {
 	if len(o) == 0 {
@@ -21,9 +21,26 @@ func (o OrderBy) encodeOrderBy(b *strings.Builder) {
 	}
 }
 
-type Asc []AliasedColumnar
+func Asc(cols ...any) OrderByColumnar {
+	columns := make(asc, len(cols))
 
-func (o Asc) encodeOrderBy(b *strings.Builder) {
+	for i := range cols {
+		switch c := cols[i].(type) {
+
+		case AliasedColumnar:
+			columns[i] = c
+
+		case string:
+			columns[i] = Column(c)
+		}
+	}
+
+	return columns
+}
+
+type asc []AliasedColumnar
+
+func (o asc) encodeOrderBy(b *strings.Builder) {
 	if len(o) == 0 {
 		return
 	}
@@ -38,9 +55,26 @@ func (o Asc) encodeOrderBy(b *strings.Builder) {
 	}
 }
 
-type Desc []AliasedColumnar
+func Desc(cols ...any) OrderByColumnar {
+	columns := make(desc, len(cols))
 
-func (o Desc) encodeOrderBy(b *strings.Builder) {
+	for i := range cols {
+		switch c := cols[i].(type) {
+
+		case AliasedColumnar:
+			columns[i] = c
+
+		case string:
+			columns[i] = Column(c)
+		}
+	}
+
+	return columns
+}
+
+type desc []AliasedColumnar
+
+func (o desc) encodeOrderBy(b *strings.Builder) {
 	if len(o) == 0 {
 		return
 	}

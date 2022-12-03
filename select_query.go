@@ -20,7 +20,7 @@ type SelectQuery struct {
 	Where   Condition
 	GroupBy AliasedColumnar
 	Having  Condition
-	OrderBy orderBy
+	OrderBy OrderByColumnar
 	Limit   int
 	Offset  int
 
