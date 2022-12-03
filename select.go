@@ -46,7 +46,7 @@ func Select(ctx context.Context, db *pgxpool.Pool, dest any, q SelectQuery, opti
 }
 
 func selectOneIntoStruct(ctx context.Context, val reflect.Value, q *SelectQuery, db *pgxpool.Pool) (err error) {
-	var selectedFields Columns
+	var selectedFields columns
 
 	elem := val.Elem()
 	typ := elem.Type()
@@ -55,7 +55,7 @@ func selectOneIntoStruct(ctx context.Context, val reflect.Value, q *SelectQuery,
 	q.Limit = 1
 
 	if q.Select == nil {
-		selectedFields = make(Columns, 0, 10)
+		selectedFields = make(columns, 0, 10)
 	}
 
 	for i := 0; i < numFields; i++ {
