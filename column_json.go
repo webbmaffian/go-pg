@@ -44,7 +44,7 @@ func (c jsonColumn) encode(b *strings.Builder) {
 	writeIdentifier(b, c.path[0])
 
 	for _, col := range c.path[1:] {
-		b.WriteString("->")
+		b.WriteString("->>")
 		writeString(b, col)
 	}
 }
