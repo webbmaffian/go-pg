@@ -24,7 +24,10 @@ type onConflict struct {
 }
 
 func (c onConflict) Update(where ...Condition) ConflictAction {
-	c.targetCondition = And(where)
+	if where != nil {
+		c.targetCondition = And(where)
+	}
+
 	return c
 }
 
@@ -53,7 +56,7 @@ func (c onConflict) encodeConflictHandler(b *strings.Builder, columns []string, 
 	}
 
 	if c.targetCondition != nil {
-		b.WriteString("WHERE ")
+		b.WriteString(" WHERE ")
 		c.targetCondition.encodeCondition(b, args)
 	}
 
