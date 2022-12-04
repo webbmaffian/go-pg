@@ -40,7 +40,7 @@ func skipField(i any) bool {
 			return true
 		}
 	case driver.Valuer:
-		if _, err := v.Value(); err != nil {
+		if val, err := v.Value(); val == nil || err != nil {
 			return true
 		}
 	}
