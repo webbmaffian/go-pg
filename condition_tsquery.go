@@ -24,7 +24,7 @@ func PrefixSearch(vectorColumn any, value string) Condition {
 			continue
 		}
 
-		terms = append(terms, prefixSearchSanitizer.Replace(word))
+		terms = append(terms, prefixSearchSanitizer.Replace(word)+":*")
 	}
 
 	return Search(vectorColumn, strings.Join(terms, " & "))
