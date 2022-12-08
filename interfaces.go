@@ -3,6 +3,9 @@ package pg
 import (
 	"context"
 	"strings"
+
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 type MutationType uint8
@@ -46,4 +49,10 @@ type Condition interface {
 
 type Queryable interface {
 	encodeQuery(b *strings.Builder, args *[]any)
+}
+
+type conn interface {
+	Exec(ctx context.Context, sql string, arguments ...any) (pgconn.CommandTag, error)
+	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
+	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
 }

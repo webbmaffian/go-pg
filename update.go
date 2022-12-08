@@ -4,11 +4,9 @@ import (
 	"context"
 	"reflect"
 	"strings"
-
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func Update(ctx context.Context, db *pgxpool.Pool, table TableSource, src any, condition Condition) (err error) {
+func Update(ctx context.Context, db conn, table TableSource, src any, condition Condition) (err error) {
 	var b strings.Builder
 	b.Grow(100)
 	args := make([]any, 0, 10)

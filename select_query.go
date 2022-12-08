@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type SelectQuery struct {
@@ -95,7 +94,7 @@ func (q *SelectQuery) encodeQuery(b *strings.Builder, args *[]any) {
 	}
 }
 
-func (q *SelectQuery) run(ctx context.Context, db *pgxpool.Pool) (err error) {
+func (q *SelectQuery) run(ctx context.Context, db conn) (err error) {
 	var b strings.Builder
 	args := make([]any, 0, 5)
 	q.encodeQuery(&b, &args)

@@ -3,11 +3,9 @@ package pg
 import (
 	"context"
 	"strings"
-
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func Delete(ctx context.Context, db *pgxpool.Pool, table TableSource, condition Condition) (err error) {
+func Delete(ctx context.Context, db conn, table TableSource, condition Condition) (err error) {
 	var b strings.Builder
 	b.Grow(64)
 	args := make([]any, 0, 2)
