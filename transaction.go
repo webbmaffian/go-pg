@@ -3,13 +3,15 @@ package pg
 import (
 	"context"
 	"errors"
+	"sync"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 var ErrReleased = errors.New("connection released")
 
-func Transaction(ctx context.Context, pool *pgxpool.Pool) (tx Tx) {
+func Transaction(ctx context.Context, pool *pgxpool.Pool) (tx *Tx) {
+	tx = new(Tx)
 	tx.ctx, tx.cancel = context.WithCancel(ctx)
 	tx.db, tx.err = pool.Acquire(tx.ctx)
 
@@ -34,6 +36,7 @@ type Tx struct {
 	cancel context.CancelFunc
 	db     *pgxpool.Conn
 	err    error
+	mu     sync.Mutex
 }
 
 func (tx *Tx) Select(t TableSource, dest any, q SelectQuery, options ...SelectOptions) error {
@@ -121,6 +124,9 @@ func (tx *Tx) maybeRollback() error {
 }
 
 func (tx *Tx) Commit() (err error) {
+	tx.mu.Lock()
+	defer tx.mu.Unlock()
+
 	if tx.err != nil {
 		return tx.err
 	}
@@ -137,6 +143,9 @@ func (tx *Tx) Commit() (err error) {
 }
 
 func (tx *Tx) Rollback() {
+	tx.mu.Lock()
+	defer tx.mu.Unlock()
+
 	if tx.db == nil {
 		return
 	}
