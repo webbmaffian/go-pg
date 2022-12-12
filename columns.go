@@ -20,6 +20,10 @@ func Columns(cols ...any) MultiColumnar {
 	return realCols
 }
 
+func AllocateColumns(capacity int) MultiColumnar {
+	return make(columns, capacity)
+}
+
 type columns []Columnar
 
 func (c columns) Append(cols ...Columnar) MultiColumnar {
