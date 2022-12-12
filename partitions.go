@@ -10,9 +10,12 @@ import (
 
 var PartitionName = func(tableName pgx.Identifier, partition string) pgx.Identifier {
 	l := len(tableName)
+	partitionName := make(pgx.Identifier, l)
+	copy(partitionName, tableName)
+	partitionName[l-1] = strings.Join([]string{"part", partitionName[l-1], partition}, "_")
 
 	// schema.table becomes schema.part_table_partitionkey
-	return append(tableName[:l-1], strings.Join([]string{"part", tableName[l-1], partition}, "_"))
+	return partitionName
 }
 
 func CreatePartition(ctx context.Context, db *pgxpool.Pool, table pgx.Identifier, partition pgx.Identifier, value string) (err error) {
