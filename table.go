@@ -61,7 +61,7 @@ func (t TableSource) Delete(ctx context.Context, condition Condition) error {
 func (t TableSource) Partition(partition string) TableSource {
 	return TableSource{
 		db:         t.db,
-		identifier: append(t.identifier, partition),
+		identifier: PartitionName(t.identifier, partition),
 	}
 }
 
@@ -75,7 +75,7 @@ func (t TableSource) Drop(ctx context.Context) (err error) {
 
 // Presumes that there is a scheme with the same name as the table, and that the partition value is a string.
 func (t TableSource) CreatePartition(ctx context.Context, partition string) (err error) {
-	return CreatePartition(ctx, t.db, t.identifier, append(t.identifier, partition), partition)
+	return CreatePartition(ctx, t.db, t.identifier, PartitionName(t.identifier, partition), partition)
 }
 
 func (t TableSource) CopyFrom(ctx context.Context, columnsNames []string, rowSrc pgx.CopyFromSource) (int64, error) {
