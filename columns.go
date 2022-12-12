@@ -21,7 +21,7 @@ func Columns(cols ...any) MultiColumnar {
 }
 
 func AllocateColumns(capacity int) MultiColumnar {
-	return make(columns, capacity)
+	return make(columns, 0, capacity)
 }
 
 type columns []Columnar
