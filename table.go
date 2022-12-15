@@ -9,16 +9,36 @@ import (
 )
 
 func Table(db *pgxpool.Pool, name ...string) TableSource {
-	return TableSource{db, pgx.Identifier(name)}
+	return TableSource{
+		db:         db,
+		identifier: pgx.Identifier(name),
+	}
 }
 
 type TableSource struct {
-	db         *pgxpool.Pool
-	identifier pgx.Identifier
+	db                 *pgxpool.Pool
+	identifier         pgx.Identifier
+	originalIdentifier pgx.Identifier
 }
 
 func (t TableSource) encodeQuery(b *strings.Builder, args *[]any) {
+	if t.originalIdentifier != nil {
+		b.WriteString(t.originalIdentifier.Sanitize())
+		b.WriteString(" AS ")
+	}
+
 	b.WriteString(t.identifier.Sanitize())
+}
+
+func (t TableSource) Alias(alias string) TableSource {
+	aliased := t
+	aliased.identifier = pgx.Identifier{alias}
+
+	if t.originalIdentifier == nil {
+		aliased.originalIdentifier = t.identifier
+	}
+
+	return aliased
 }
 
 func (t TableSource) Select(ctx context.Context, dest any, q SelectQuery, options ...SelectOptions) error {
