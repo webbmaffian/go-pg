@@ -42,71 +42,99 @@ func (c aggregatedColumn) has(column string) bool {
 	return c.alias == column
 }
 
-func Count(distinctColumn ...string) AliasedColumnar {
+func Count(distinctColumn ...any) AliasedColumnar {
 	return aggregatedColumn{
 		function: "COUNT",
 		argsCallback: func(b *strings.Builder) {
 			if len(distinctColumn) == 0 {
 				b.WriteString("*")
 			} else {
+				var col Columnar
+
+				switch v := distinctColumn[0].(type) {
+				case Columnar:
+					col = v
+				case string:
+					col = Column(v)
+				}
 				b.WriteString("DISTINCT ")
-				writeIdentifier(b, distinctColumn...)
+				col.encodeColumnIdentifier(b)
 			}
 		},
 	}
 }
 
-func Unnest(columnPath ...string) AliasedColumnar {
-	return aggregatedColumn{
-		function: "UNNEST",
-		argsCallback: func(b *strings.Builder) {
-			writeIdentifier(b, columnPath...)
-		},
-	}
+func Unnest(column any) AliasedColumnar {
+	return Aggregate("UNNEST", column)
 }
 
-func DateTrunc(per string, columnPath ...string) AliasedColumnar {
+func DateTrunc(per string, column any) AliasedColumnar {
+	var col Columnar
+
+	switch v := column.(type) {
+	case Columnar:
+		col = v
+	case string:
+		col = Column(v)
+	}
+
 	return aggregatedColumn{
 		function: "date_trunc",
 		argsCallback: func(b *strings.Builder) {
 			b.WriteByte('\'')
 			b.WriteString(per)
 			b.WriteString("', ")
-			writeIdentifier(b, columnPath...)
+			col.encodeColumnIdentifier(b)
 		},
 	}
 }
 
-func Has(columnPath ...string) AliasedColumnar {
+func Has(column any) AliasedColumnar {
+	var col Columnar
+
+	switch v := column.(type) {
+	case Columnar:
+		col = v
+	case string:
+		col = Column(v)
+	}
+
 	return aggregatedColumn{
 		argsCallback: func(b *strings.Builder) {
-			writeIdentifier(b, columnPath...)
+			col.encodeColumnIdentifier(b)
 			b.WriteString(" IS NOT NULL")
 		},
 	}
 }
 
-func Min(columnPath ...string) AliasedColumnar {
-	return Aggregate("MIN", columnPath...)
+func Min(column any) AliasedColumnar {
+	return Aggregate("MIN", column)
 }
 
-func Max(columnPath ...string) AliasedColumnar {
-	return Aggregate("MAX", columnPath...)
+func Max(column any) AliasedColumnar {
+	return Aggregate("MAX", column)
 }
 
-func Sum(columnPath ...string) AliasedColumnar {
-	return Aggregate("SUM", columnPath...)
+func Sum(column any) AliasedColumnar {
+	return Aggregate("SUM", column)
 }
 
-func ArrayAgg(columnPath ...string) AliasedColumnar {
-	return Aggregate("ARRAY_AGG", columnPath...)
+func ArrayAgg(column string) AliasedColumnar {
+	return Aggregate("ARRAY_AGG", column)
 }
 
-func Aggregate(aggFunc string, columnPath ...string) AliasedColumnar {
+func Aggregate(aggFunc string, column any) AliasedColumnar {
+	var col Columnar
+
+	switch v := column.(type) {
+	case Columnar:
+		col = v
+	case string:
+		col = Column(v)
+	}
+
 	return aggregatedColumn{
-		function: aggFunc,
-		argsCallback: func(b *strings.Builder) {
-			writeIdentifier(b, columnPath...)
-		},
+		function:     aggFunc,
+		argsCallback: col.encodeColumnIdentifier,
 	}
 }
