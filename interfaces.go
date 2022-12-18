@@ -28,6 +28,7 @@ type IsZeroer interface {
 }
 
 type Columnar interface {
+	IsZeroer
 	encodeColumn(b *strings.Builder)
 	encodeColumnIdentifier(b *strings.Builder)
 	has(col string) bool
@@ -43,11 +44,18 @@ type MultiColumnar interface {
 	Append(...Columnar) MultiColumnar
 }
 
+type OrderByColumnar interface {
+	IsZeroer
+	encodeOrderBy(b *strings.Builder)
+}
+
 type Condition interface {
+	IsZeroer
 	encodeCondition(b *strings.Builder, args *[]any)
 }
 
 type Queryable interface {
+	IsZeroer
 	encodeQuery(b *strings.Builder, args *[]any)
 }
 

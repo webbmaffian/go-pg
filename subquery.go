@@ -2,6 +2,8 @@ package pg
 
 import "strings"
 
+var _ Queryable = SubquerySource{}
+
 func Subquery(alias string, query SelectQuery) SubquerySource {
 	return SubquerySource{alias, query}
 }
@@ -9,6 +11,10 @@ func Subquery(alias string, query SelectQuery) SubquerySource {
 type SubquerySource struct {
 	alias string
 	query SelectQuery
+}
+
+func (t SubquerySource) IsZero() bool {
+	return t.query.IsZero()
 }
 
 func (t SubquerySource) encodeQuery(b *strings.Builder, args *[]any) {

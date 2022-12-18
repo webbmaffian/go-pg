@@ -2,10 +2,6 @@ package pg
 
 import "strings"
 
-type OrderByColumnar interface {
-	encodeOrderBy(b *strings.Builder)
-}
-
 type OrderBy []OrderByColumnar
 
 func (o OrderBy) encodeOrderBy(b *strings.Builder) {
@@ -44,6 +40,16 @@ func Asc(cols ...any) OrderByColumnar {
 
 type asc []Columnar
 
+func (o asc) IsZero() bool {
+	for i := range o {
+		if !o[i].IsZero() {
+			return false
+		}
+	}
+
+	return true
+}
+
 func (o asc) encodeOrderBy(b *strings.Builder) {
 	if len(o) == 0 {
 		return
@@ -81,6 +87,16 @@ func Desc(cols ...any) OrderByColumnar {
 }
 
 type desc []Columnar
+
+func (o desc) IsZero() bool {
+	for i := range o {
+		if !o[i].IsZero() {
+			return false
+		}
+	}
+
+	return true
+}
 
 func (o desc) encodeOrderBy(b *strings.Builder) {
 	if len(o) == 0 {

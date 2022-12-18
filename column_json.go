@@ -14,6 +14,10 @@ type jsonColumn struct {
 	table *TableSource
 }
 
+func (c jsonColumn) IsZero() bool {
+	return c.path == nil
+}
+
 func (c jsonColumn) encodeColumn(b *strings.Builder) {
 	c.encode(b)
 

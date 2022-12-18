@@ -13,6 +13,10 @@ type rawColumn struct {
 	alias string
 }
 
+func (c rawColumn) IsZero() bool {
+	return c.raw == ""
+}
+
 func (c rawColumn) encodeColumn(b *strings.Builder) {
 	b.WriteString(c.raw)
 

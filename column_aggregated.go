@@ -8,6 +8,10 @@ type aggregatedColumn struct {
 	alias        string
 }
 
+func (c aggregatedColumn) IsZero() bool {
+	return c.function == "" && c.argsCallback == nil && c.alias == ""
+}
+
 func (c aggregatedColumn) encodeColumn(b *strings.Builder) {
 	if c.function != "" {
 		b.WriteString(c.function)

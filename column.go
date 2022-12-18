@@ -14,6 +14,10 @@ type column struct {
 	table *TableSource
 }
 
+func (c column) IsZero() bool {
+	return c.path == nil
+}
+
 func (c column) encodeColumn(b *strings.Builder) {
 	c.encode(b)
 

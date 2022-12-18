@@ -21,6 +21,10 @@ type TableSource struct {
 	originalIdentifier pgx.Identifier
 }
 
+func (t TableSource) IsZero() bool {
+	return t.identifier == nil
+}
+
 func (t TableSource) encodeQuery(b *strings.Builder, args *[]any) {
 	if t.originalIdentifier != nil {
 		b.WriteString(t.originalIdentifier.Sanitize())

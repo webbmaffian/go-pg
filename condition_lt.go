@@ -22,6 +22,10 @@ type lt struct {
 	value  any
 }
 
+func (c lt) IsZero() bool {
+	return c.column.IsZero()
+}
+
 func (c lt) encodeCondition(b *strings.Builder, args *[]any) {
 	c.column.encodeColumnIdentifier(b)
 	b.WriteString(" < ")

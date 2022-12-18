@@ -16,6 +16,10 @@ type raw struct {
 	Params []any
 }
 
+func (c raw) IsZero() bool {
+	return c.String == ""
+}
+
 func (c raw) encodeCondition(b *strings.Builder, args *[]any) {
 	if len(c.Params) == 0 {
 		b.WriteString(c.String)

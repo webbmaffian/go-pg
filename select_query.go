@@ -28,6 +28,10 @@ type SelectOptions struct {
 	AfterMarshal  func(data *map[string]any) error
 }
 
+func (q SelectQuery) IsZero() bool {
+	return q.From.IsZero()
+}
+
 func (q *SelectQuery) Error() error {
 	return q.error
 }
@@ -41,41 +45,44 @@ func (q *SelectQuery) String() string {
 func (q *SelectQuery) encodeQuery(b *strings.Builder, args *[]any) {
 	b.Grow(300)
 
-	if q.Select != nil {
+	if q.Select != nil && !q.Select.IsZero() {
 		b.WriteString("SELECT ")
 		q.Select.encodeColumn(b)
 		b.WriteByte('\n')
+	} else {
+		b.WriteString("SELECT *")
+		b.WriteByte('\n')
 	}
 
-	if q.From != nil {
+	if q.From != nil && !q.From.IsZero() {
 		b.WriteString("FROM ")
 		q.From.encodeQuery(b, args)
 		b.WriteByte('\n')
 	}
 
-	if q.Join != nil {
+	if q.Join != nil && !q.Join.IsZero() {
 		q.Join.encodeJoin(b, args)
 	}
 
-	if q.Where != nil {
+	if q.Where != nil && !q.Where.IsZero() {
 		b.WriteString("WHERE ")
 		q.Where.encodeCondition(b, args)
 		b.WriteByte('\n')
 	}
 
-	if q.GroupBy != nil {
+	if q.GroupBy != nil && !q.GroupBy.IsZero() {
 		b.WriteString("GROUP BY ")
 		q.GroupBy.encodeColumnIdentifier(b)
 		b.WriteByte('\n')
 	}
 
-	if q.Having != nil {
+	if q.Having != nil && !q.Having.IsZero() {
 		b.WriteString("HAVING ")
 		q.Having.encodeCondition(b, args)
 		b.WriteByte('\n')
 	}
 
-	if q.OrderBy != nil {
+	if q.OrderBy != nil && !q.OrderBy.IsZero() {
 		b.WriteString("ORDER BY ")
 		q.OrderBy.encodeOrderBy(b)
 		b.WriteByte('\n')

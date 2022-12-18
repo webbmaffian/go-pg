@@ -26,6 +26,16 @@ func AllocateColumns(capacity int) MultiColumnar {
 
 type columns []Columnar
 
+func (c columns) IsZero() bool {
+	for i := range c {
+		if !c[i].IsZero() {
+			return false
+		}
+	}
+
+	return true
+}
+
 func (c columns) Append(cols ...Columnar) MultiColumnar {
 	return append(c, cols...)
 }

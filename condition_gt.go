@@ -22,6 +22,10 @@ type gt struct {
 	value  any
 }
 
+func (c gt) IsZero() bool {
+	return c.column.IsZero()
+}
+
 func (c gt) encodeCondition(b *strings.Builder, args *[]any) {
 	c.column.encodeColumnIdentifier(b)
 	b.WriteString(" > ")

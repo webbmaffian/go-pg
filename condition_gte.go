@@ -22,6 +22,10 @@ type gte struct {
 	value  any
 }
 
+func (c gte) IsZero() bool {
+	return c.column.IsZero()
+}
+
 func (c gte) encodeCondition(b *strings.Builder, args *[]any) {
 	c.column.encodeColumnIdentifier(b)
 	b.WriteString(" >= ")

@@ -50,6 +50,10 @@ type tsQuery struct {
 	value  any
 }
 
+func (c tsQuery) IsZero() bool {
+	return c.column.IsZero()
+}
+
 func (c tsQuery) encodeCondition(b *strings.Builder, args *[]any) {
 	c.column.encodeColumnIdentifier(b)
 

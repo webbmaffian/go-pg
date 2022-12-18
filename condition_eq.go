@@ -22,6 +22,10 @@ type eq struct {
 	value  any
 }
 
+func (c eq) IsZero() bool {
+	return c.column.IsZero()
+}
+
 func (c eq) encodeCondition(b *strings.Builder, args *[]any) {
 	c.column.encodeColumnIdentifier(b)
 

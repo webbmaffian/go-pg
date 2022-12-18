@@ -26,6 +26,10 @@ type some struct {
 	value  any
 }
 
+func (c some) IsZero() bool {
+	return c.column.IsZero()
+}
+
 func (c some) encodeCondition(b *strings.Builder, args *[]any) {
 	writeParam(b, args, c.value)
 	b.WriteString(" = ANY (")

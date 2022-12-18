@@ -3,10 +3,15 @@ package pg
 import "strings"
 
 type Join interface {
+	IsZeroer
 	encodeJoin(b *strings.Builder, args *[]any)
 }
 
 type Joins []Join
+
+func (j Joins) IsZero() bool {
+	return j == nil
+}
 
 func (j Joins) encodeJoin(b *strings.Builder, args *[]any) {
 	for _, join := range j {
@@ -50,6 +55,10 @@ type join struct {
 	joinType  string
 	table     Queryable
 	condition Condition
+}
+
+func (j join) IsZero() bool {
+	return j.table == nil
 }
 
 func (j join) encodeJoin(b *strings.Builder, args *[]any) {

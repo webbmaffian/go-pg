@@ -22,6 +22,10 @@ type notEq struct {
 	value  any
 }
 
+func (c notEq) IsZero() bool {
+	return c.column.IsZero()
+}
+
 func (c notEq) encodeCondition(b *strings.Builder, args *[]any) {
 	c.column.encodeColumnIdentifier(b)
 

@@ -22,6 +22,10 @@ type notIn struct {
 	value  any
 }
 
+func (c notIn) IsZero() bool {
+	return c.column.IsZero()
+}
+
 func (c notIn) encodeCondition(b *strings.Builder, args *[]any) {
 	c.column.encodeColumnIdentifier(b)
 
