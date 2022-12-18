@@ -2,7 +2,19 @@ package pg
 
 import "strings"
 
+var _ OrderByColumnar = OrderBy{}
+
 type OrderBy []OrderByColumnar
+
+func (o OrderBy) IsZero() bool {
+	for i := range o {
+		if !o[i].IsZero() {
+			return false
+		}
+	}
+
+	return true
+}
 
 func (o OrderBy) encodeOrderBy(b *strings.Builder) {
 	if len(o) == 0 {
