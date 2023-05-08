@@ -57,6 +57,12 @@ func (t TableSource) SelectTotal(ctx context.Context, dest *int, q SelectQuery) 
 	return SelectTotal(ctx, t.db, dest, q)
 }
 
+func (t TableSource) SelectValue(ctx context.Context, dest any, q SelectQuery) error {
+	q.From = t
+
+	return SelectValue(ctx, t.db, dest, q)
+}
+
 func (t TableSource) Iterate(ctx context.Context, q SelectQuery, iterator func(values []any) error) error {
 	q.From = t
 
