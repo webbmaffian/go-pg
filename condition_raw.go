@@ -8,6 +8,7 @@ import (
 func Raw(str string, params ...any) Condition {
 	return raw{
 		String: str,
+		Params: params,
 	}
 }
 
