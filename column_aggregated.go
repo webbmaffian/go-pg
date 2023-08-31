@@ -119,8 +119,27 @@ func Sum(column any) AliasedColumnar {
 	return Aggregate("SUM", column)
 }
 
-func ArrayAgg(column string) AliasedColumnar {
-	return Aggregate("ARRAY_AGG", column)
+func ArrayAgg(column any, orderBy ...OrderByColumnar) AliasedColumnar {
+	var col Columnar
+
+	switch v := column.(type) {
+	case Columnar:
+		col = v
+	case string:
+		col = Column(v)
+	}
+
+	return aggregatedColumn{
+		function: "ARRAY_AGG",
+		argsCallback: func(b *strings.Builder) {
+			col.encodeColumnIdentifier(b)
+
+			if orderBy != nil && orderBy[0] != nil {
+				b.WriteString(" ORDER BY ")
+				orderBy[0].encodeOrderBy(b)
+			}
+		},
+	}
 }
 
 func Aggregate(aggFunc string, column any) AliasedColumnar {
