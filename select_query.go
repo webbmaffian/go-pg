@@ -119,6 +119,10 @@ func (q *SelectQuery) run(ctx context.Context, db conn) (err error) {
 	return
 }
 
+func (q *SelectQuery) Run(ctx context.Context, db conn) error {
+	return q.run(ctx, db)
+}
+
 func (q *SelectQuery) Next() bool {
 	if q.result == nil {
 		return false
