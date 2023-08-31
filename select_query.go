@@ -145,6 +145,10 @@ func (q *SelectQuery) Scan(dest ...any) error {
 	return q.result.Scan(dest...)
 }
 
+func (q *SelectQuery) RawValues() [][]byte {
+	return q.result.RawValues()
+}
+
 func (q *SelectQuery) Close() {
 	if q.result != nil {
 		q.result.Close()
