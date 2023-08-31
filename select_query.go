@@ -131,6 +131,7 @@ func (q *SelectQuery) Next() bool {
 	n := q.result.Next()
 
 	if !n {
+		q.result.Close()
 		q.result = nil
 	}
 
