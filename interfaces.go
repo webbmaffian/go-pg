@@ -64,3 +64,10 @@ type conn interface {
 	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
 	QueryRow(ctx context.Context, sql string, args ...any) pgx.Row
 }
+
+type RawData interface {
+	AliasedColumnar
+	Condition
+	Queryable
+	Column(path ...string) AliasedColumnar
+}
