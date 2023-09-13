@@ -69,4 +69,5 @@ type RawData interface {
 	Columnar
 	Condition
 	Queryable
+	Alias(alias string) RawData
 }
