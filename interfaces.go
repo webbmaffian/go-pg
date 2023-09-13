@@ -66,8 +66,7 @@ type conn interface {
 }
 
 type RawData interface {
-	AliasedColumnar
+	Columnar
 	Condition
 	Queryable
-	Column(path ...string) AliasedColumnar
 }

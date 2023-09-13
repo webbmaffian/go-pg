@@ -14,7 +14,7 @@ func Raw(str string, params ...any) RawData {
 }
 
 // Deprecated: Use Raw() instead
-func RawColumn(str string) AliasedColumnar {
+func RawColumn(str string) RawData {
 	return raw{
 		raw: str,
 	}
@@ -72,7 +72,7 @@ func (c raw) encodeColumnIdentifier(b *strings.Builder) {
 	}
 }
 
-func (c raw) Alias(alias string) AliasedColumnar {
+func (c raw) Alias(alias string) RawData {
 	c.alias = alias
 	return c
 }
@@ -92,8 +92,4 @@ func (c raw) encodeQuery(b *strings.Builder, args *[]any) {
 		b.WriteString(" AS ")
 		b.WriteString(c.alias)
 	}
-}
-
-func (c raw) Column(path ...string) AliasedColumnar {
-	return c
 }
