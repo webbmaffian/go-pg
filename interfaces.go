@@ -70,4 +70,5 @@ type RawData interface {
 	Condition
 	Queryable
 	Alias(alias string) RawData
+	Column(path ...string) AliasedColumnar
 }

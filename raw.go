@@ -93,3 +93,15 @@ func (c raw) encodeQuery(b *strings.Builder, args *[]any) {
 		b.WriteString(c.alias)
 	}
 }
+
+func (c raw) Column(path ...string) AliasedColumnar {
+	if path == nil {
+		return column{
+			alias: c.alias,
+		}
+	}
+
+	return column{
+		path: path,
+	}
+}
