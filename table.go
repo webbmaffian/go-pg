@@ -118,8 +118,16 @@ func (t TableSource) CreatePartition(ctx context.Context, partition string) (err
 	return CreatePartition(ctx, t.db, t.identifier, PartitionName(t.identifier, partition), partition)
 }
 
-func (t TableSource) CopyFrom(ctx context.Context, columnsNames []string, rowSrc pgx.CopyFromSource) (int64, error) {
-	return t.db.CopyFrom(ctx, t.identifier, columnsNames, rowSrc)
+func (t TableSource) CopyFrom(ctx context.Context, columnNames []string, rowSrc pgx.CopyFromSource) (int64, error) {
+	db, err := t.db.Acquire(ctx)
+
+	if err != nil {
+		return 0, err
+	}
+
+	defer db.Release()
+
+	return CopyFrom(ctx, db, t.identifier, columnNames, rowSrc)
 }
 
 func (t *TableSource) Column(path ...string) AliasedColumnar {
