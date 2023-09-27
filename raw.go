@@ -2,7 +2,6 @@ package pg
 
 import (
 	"bytes"
-	"strings"
 )
 
 // Any raw part of the query. Params will only be used for conditions.
@@ -30,7 +29,7 @@ func (c raw) IsZero() bool {
 	return c.raw == ""
 }
 
-func (c raw) encodeCondition(b *strings.Builder, args *[]any) {
+func (c raw) encodeCondition(b ByteStringWriter, args *[]any) {
 	if len(c.params) == 0 {
 		b.WriteString(c.raw)
 		return
@@ -55,7 +54,7 @@ func (c raw) encodeCondition(b *strings.Builder, args *[]any) {
 	b.Write(str[prev:])
 }
 
-func (c raw) encodeColumn(b *strings.Builder) {
+func (c raw) encodeColumn(b ByteStringWriter) {
 	b.WriteString(c.raw)
 
 	if c.alias != "" {
@@ -64,7 +63,7 @@ func (c raw) encodeColumn(b *strings.Builder) {
 	}
 }
 
-func (c raw) encodeColumnIdentifier(b *strings.Builder) {
+func (c raw) encodeColumnIdentifier(b ByteStringWriter) {
 	if c.alias != "" {
 		writeIdentifier(b, c.alias)
 	} else {
@@ -85,7 +84,7 @@ func (c raw) has(col string) bool {
 	return c.raw == col
 }
 
-func (c raw) encodeQuery(b *strings.Builder, args *[]any) {
+func (c raw) encodeQuery(b ByteStringWriter, args *[]any) {
 	b.WriteString(c.raw)
 
 	if c.alias != "" {

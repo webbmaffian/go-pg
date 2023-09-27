@@ -84,7 +84,7 @@ func Insert(ctx context.Context, db conn, table TableSource, src any, onConflict
 	return
 }
 
-func insertFromMap(b *strings.Builder, values *strings.Builder, keys *[]string, args *[]any, src map[string]any) (err error) {
+func insertFromMap(b ByteStringWriter, values ByteStringWriter, keys *[]string, args *[]any, src map[string]any) (err error) {
 	first := true
 
 	b.WriteByte('(')
@@ -109,7 +109,7 @@ func insertFromMap(b *strings.Builder, values *strings.Builder, keys *[]string, 
 	return
 }
 
-func insertFromStruct(b *strings.Builder, values *strings.Builder, keys *[]string, args *[]any, src any) (err error) {
+func insertFromStruct(b ByteStringWriter, values ByteStringWriter, keys *[]string, args *[]any, src any) (err error) {
 	first := true
 
 	b.WriteByte('(')

@@ -1,7 +1,5 @@
 package pg
 
-import "strings"
-
 func Gt(column any, value any) Condition {
 	c := gt{
 		value: value,
@@ -26,7 +24,7 @@ func (c gt) IsZero() bool {
 	return c.column.IsZero()
 }
 
-func (c gt) encodeCondition(b *strings.Builder, args *[]any) {
+func (c gt) encodeCondition(b ByteStringWriter, args *[]any) {
 	c.column.encodeColumnIdentifier(b)
 	b.WriteString(" > ")
 	writeParam(b, args, c.value)

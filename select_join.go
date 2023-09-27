@@ -1,10 +1,8 @@
 package pg
 
-import "strings"
-
 type Join interface {
 	IsZeroer
-	encodeJoin(b *strings.Builder, args *[]any)
+	encodeJoin(b ByteStringWriter, args *[]any)
 }
 
 type Joins []Join
@@ -13,7 +11,7 @@ func (j Joins) IsZero() bool {
 	return j == nil
 }
 
-func (j Joins) encodeJoin(b *strings.Builder, args *[]any) {
+func (j Joins) encodeJoin(b ByteStringWriter, args *[]any) {
 	for _, join := range j {
 		join.encodeJoin(b, args)
 	}
@@ -61,7 +59,7 @@ func (j join) IsZero() bool {
 	return j.table == nil
 }
 
-func (j join) encodeJoin(b *strings.Builder, args *[]any) {
+func (j join) encodeJoin(b ByteStringWriter, args *[]any) {
 	b.WriteString(j.joinType)
 	b.WriteByte(' ')
 	j.table.encodeQuery(b, args)

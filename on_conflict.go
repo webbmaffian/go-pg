@@ -1,16 +1,12 @@
 package pg
 
-import (
-	"strings"
-)
-
 type ConflictTarget interface {
 	Update(where ...Condition) ConflictAction
 	DoNothing() ConflictAction
 }
 
 type ConflictAction interface {
-	encodeConflictHandler(b *strings.Builder, columns []string, args *[]any) error
+	encodeConflictHandler(b ByteStringWriter, columns []string, args *[]any) error
 }
 
 func OnConflict(conflictingColumns ...any) ConflictTarget {
@@ -36,7 +32,7 @@ func (c onConflict) DoNothing() ConflictAction {
 	return c
 }
 
-func (c onConflict) encodeConflictHandler(b *strings.Builder, columns []string, args *[]any) (err error) {
+func (c onConflict) encodeConflictHandler(b ByteStringWriter, columns []string, args *[]any) (err error) {
 	if len(columns) == 0 {
 		b.WriteByte('\n')
 		b.WriteString("ON CONFLICT DO NOTHING")

@@ -48,11 +48,11 @@ func skipField(i any) bool {
 	return false
 }
 
-func writeInt[T int | int8 | int16 | int32 | int64 | uint | uint8 | uint16 | uint32 | uint64](b *strings.Builder, v T) {
+func writeInt[T int | int8 | int16 | int32 | int64 | uint | uint8 | uint16 | uint32 | uint64](b ByteStringWriter, v T) {
 	b.Write(strconv.AppendInt([]byte{}, int64(v), 10))
 }
 
-func writeParam(b *strings.Builder, args *[]any, value any) {
+func writeParam(b ByteStringWriter, args *[]any, value any) {
 	if col, ok := value.(Columnar); ok {
 		col.encodeColumnIdentifier(b)
 	} else {
@@ -62,7 +62,7 @@ func writeParam(b *strings.Builder, args *[]any, value any) {
 	}
 }
 
-func writeIdentifier(b *strings.Builder, identifiers ...string) {
+func writeIdentifier(b ByteStringWriter, identifiers ...string) {
 	if len(identifiers) == 0 {
 		return
 	}
@@ -84,7 +84,7 @@ func writeIdentifier(b *strings.Builder, identifiers ...string) {
 
 var stringReplacer = strings.NewReplacer("'", "", "\\", "")
 
-func writeString(b *strings.Builder, str string) {
+func writeString(b ByteStringWriter, str string) {
 	b.WriteByte('\'')
 	stringReplacer.WriteString(b, str)
 	b.WriteByte('\'')

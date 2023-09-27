@@ -1,7 +1,5 @@
 package pg
 
-import "strings"
-
 var _ Condition = Or{}
 
 type Or []Condition
@@ -10,7 +8,7 @@ func (c Or) IsZero() bool {
 	return c == nil
 }
 
-func (c Or) encodeCondition(b *strings.Builder, args *[]any) {
+func (c Or) encodeCondition(b ByteStringWriter, args *[]any) {
 	if c == nil {
 		return
 	}

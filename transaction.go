@@ -88,6 +88,10 @@ func (tx *Tx) Insert(t TableSource, src any, onConflict ...ConflictAction) error
 	return tx.maybeRollback()
 }
 
+func (tx *Tx) InsertRow(t TableSource, onConflict ...ConflictAction) RowInserter {
+	return InsertRow(t.db, t, onConflict...)
+}
+
 func (tx *Tx) Update(t TableSource, src any, condition Condition) error {
 	if tx.err != nil {
 		return tx.err

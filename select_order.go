@@ -1,7 +1,5 @@
 package pg
 
-import "strings"
-
 var _ OrderByColumnar = OrderBy{}
 
 type OrderBy []OrderByColumnar
@@ -16,7 +14,7 @@ func (o OrderBy) IsZero() bool {
 	return true
 }
 
-func (o OrderBy) encodeOrderBy(b *strings.Builder) {
+func (o OrderBy) encodeOrderBy(b ByteStringWriter) {
 	if len(o) == 0 {
 		return
 	}
@@ -62,7 +60,7 @@ func (o asc) IsZero() bool {
 	return true
 }
 
-func (o asc) encodeOrderBy(b *strings.Builder) {
+func (o asc) encodeOrderBy(b ByteStringWriter) {
 	if len(o) == 0 {
 		return
 	}
@@ -110,7 +108,7 @@ func (o desc) IsZero() bool {
 	return true
 }
 
-func (o desc) encodeOrderBy(b *strings.Builder) {
+func (o desc) encodeOrderBy(b ByteStringWriter) {
 	if len(o) == 0 {
 		return
 	}

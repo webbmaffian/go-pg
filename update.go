@@ -72,7 +72,7 @@ func Update(ctx context.Context, db conn, table TableSource, src any, condition 
 	return
 }
 
-func updateFromMap(b *strings.Builder, src map[string]any, args *[]any) (err error) {
+func updateFromMap(b ByteStringWriter, src map[string]any, args *[]any) (err error) {
 	first := true
 
 	for k, v := range src {
@@ -90,7 +90,7 @@ func updateFromMap(b *strings.Builder, src map[string]any, args *[]any) (err err
 	return
 }
 
-func updateFromStruct(b *strings.Builder, src any, args *[]any) (err error) {
+func updateFromStruct(b ByteStringWriter, src any, args *[]any) (err error) {
 	first := true
 	elem := reflect.ValueOf(src)
 

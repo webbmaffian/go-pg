@@ -1,7 +1,5 @@
 package pg
 
-import "strings"
-
 func Column(path ...string) AliasedColumnar {
 	return column{
 		path: path,
@@ -18,7 +16,7 @@ func (c column) IsZero() bool {
 	return c.path == nil
 }
 
-func (c column) encodeColumn(b *strings.Builder) {
+func (c column) encodeColumn(b ByteStringWriter) {
 	c.encode(b)
 
 	if c.alias != "" {
@@ -27,7 +25,7 @@ func (c column) encodeColumn(b *strings.Builder) {
 	}
 }
 
-func (c column) encodeColumnIdentifier(b *strings.Builder) {
+func (c column) encodeColumnIdentifier(b ByteStringWriter) {
 	if c.alias != "" {
 		writeIdentifier(b, c.alias)
 	} else {
@@ -35,7 +33,7 @@ func (c column) encodeColumnIdentifier(b *strings.Builder) {
 	}
 }
 
-func (c column) encode(b *strings.Builder) {
+func (c column) encode(b ByteStringWriter) {
 	l := len(c.path)
 
 	if l > 1 {

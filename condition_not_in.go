@@ -1,7 +1,5 @@
 package pg
 
-import "strings"
-
 func NotIn(column any, value any) Condition {
 	c := notIn{
 		value: value,
@@ -26,7 +24,7 @@ func (c notIn) IsZero() bool {
 	return c.column.IsZero()
 }
 
-func (c notIn) encodeCondition(b *strings.Builder, args *[]any) {
+func (c notIn) encodeCondition(b ByteStringWriter, args *[]any) {
 	c.column.encodeColumnIdentifier(b)
 
 	switch v := c.value.(type) {

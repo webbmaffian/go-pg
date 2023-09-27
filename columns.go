@@ -1,7 +1,5 @@
 package pg
 
-import "strings"
-
 func Columns(cols ...any) MultiColumnar {
 	realCols := make(columns, len(cols))
 
@@ -40,7 +38,7 @@ func (c columns) Append(cols ...Columnar) MultiColumnar {
 	return append(c, cols...)
 }
 
-func (c columns) encodeColumn(b *strings.Builder) {
+func (c columns) encodeColumn(b ByteStringWriter) {
 	if c == nil {
 		return
 	}
@@ -53,7 +51,7 @@ func (c columns) encodeColumn(b *strings.Builder) {
 	}
 }
 
-func (c columns) encodeColumnIdentifier(b *strings.Builder) {
+func (c columns) encodeColumnIdentifier(b ByteStringWriter) {
 	if c == nil {
 		return
 	}

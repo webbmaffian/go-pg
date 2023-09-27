@@ -1,7 +1,5 @@
 package pg
 
-import "strings"
-
 func JsonColumn(path ...string) AliasedColumnar {
 	return jsonColumn{
 		path: path,
@@ -18,7 +16,7 @@ func (c jsonColumn) IsZero() bool {
 	return c.path == nil
 }
 
-func (c jsonColumn) encodeColumn(b *strings.Builder) {
+func (c jsonColumn) encodeColumn(b ByteStringWriter) {
 	c.encode(b)
 
 	if c.alias != "" {
@@ -27,7 +25,7 @@ func (c jsonColumn) encodeColumn(b *strings.Builder) {
 	}
 }
 
-func (c jsonColumn) encodeColumnIdentifier(b *strings.Builder) {
+func (c jsonColumn) encodeColumnIdentifier(b ByteStringWriter) {
 	if c.alias != "" {
 		writeIdentifier(b, c.alias)
 	} else {
@@ -35,7 +33,7 @@ func (c jsonColumn) encodeColumnIdentifier(b *strings.Builder) {
 	}
 }
 
-func (c jsonColumn) encode(b *strings.Builder) {
+func (c jsonColumn) encode(b ByteStringWriter) {
 	if c.path == nil {
 		return
 	}

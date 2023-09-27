@@ -54,7 +54,7 @@ func (c tsQuery) IsZero() bool {
 	return c.column.IsZero()
 }
 
-func (c tsQuery) encodeCondition(b *strings.Builder, args *[]any) {
+func (c tsQuery) encodeCondition(b ByteStringWriter, args *[]any) {
 	c.column.encodeColumnIdentifier(b)
 
 	b.WriteString(" @@ to_tsquery('")

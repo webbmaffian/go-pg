@@ -1,10 +1,8 @@
 package pg
 
-import "strings"
-
 type aggregatedColumn struct {
 	function     string
-	argsCallback func(b *strings.Builder)
+	argsCallback func(b ByteStringWriter)
 	alias        string
 }
 
@@ -12,7 +10,7 @@ func (c aggregatedColumn) IsZero() bool {
 	return c.function == "" && c.argsCallback == nil && c.alias == ""
 }
 
-func (c aggregatedColumn) encodeColumn(b *strings.Builder) {
+func (c aggregatedColumn) encodeColumn(b ByteStringWriter) {
 	if c.function != "" {
 		b.WriteString(c.function)
 	}
@@ -34,7 +32,7 @@ func (c aggregatedColumn) Alias(alias string) AliasedColumnar {
 	return c
 }
 
-func (c aggregatedColumn) encodeColumnIdentifier(b *strings.Builder) {
+func (c aggregatedColumn) encodeColumnIdentifier(b ByteStringWriter) {
 	writeIdentifier(b, c.alias)
 }
 
@@ -45,7 +43,7 @@ func (c aggregatedColumn) has(column string) bool {
 func Count(distinctColumn ...any) AliasedColumnar {
 	return aggregatedColumn{
 		function: "COUNT",
-		argsCallback: func(b *strings.Builder) {
+		argsCallback: func(b ByteStringWriter) {
 			if len(distinctColumn) == 0 {
 				b.WriteString("*")
 			} else {
@@ -80,7 +78,7 @@ func DateTrunc(per string, column any) AliasedColumnar {
 
 	return aggregatedColumn{
 		function: "date_trunc",
-		argsCallback: func(b *strings.Builder) {
+		argsCallback: func(b ByteStringWriter) {
 			b.WriteByte('\'')
 			b.WriteString(per)
 			b.WriteString("', ")
@@ -100,7 +98,7 @@ func Has(column any) AliasedColumnar {
 	}
 
 	return aggregatedColumn{
-		argsCallback: func(b *strings.Builder) {
+		argsCallback: func(b ByteStringWriter) {
 			col.encodeColumnIdentifier(b)
 			b.WriteString(" IS NOT NULL")
 		},
@@ -131,7 +129,7 @@ func ArrayAgg(column any, orderBy ...OrderByColumnar) AliasedColumnar {
 
 	return aggregatedColumn{
 		function: "ARRAY_AGG",
-		argsCallback: func(b *strings.Builder) {
+		argsCallback: func(b ByteStringWriter) {
 			col.encodeColumnIdentifier(b)
 
 			if orderBy != nil && orderBy[0] != nil {

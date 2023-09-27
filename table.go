@@ -25,7 +25,7 @@ func (t TableSource) IsZero() bool {
 	return t.identifier == nil
 }
 
-func (t TableSource) encodeQuery(b *strings.Builder, args *[]any) {
+func (t TableSource) encodeQuery(b ByteStringWriter, args *[]any) {
 	if t.originalIdentifier != nil {
 		b.WriteString(t.originalIdentifier.Sanitize())
 		b.WriteString(" AS ")
@@ -83,6 +83,10 @@ func (t TableSource) Query(ctx context.Context, q *SelectQuery) (err error) {
 
 func (t TableSource) Insert(ctx context.Context, src any, onConflict ...ConflictAction) error {
 	return Insert(ctx, t.db, t, src, onConflict...)
+}
+
+func (t TableSource) InsertRow(ctx context.Context, onConflict ...ConflictAction) RowInserter {
+	return InsertRow(t.db, t, onConflict...)
 }
 
 func (t TableSource) Update(ctx context.Context, src any, condition Condition) error {

@@ -2,7 +2,7 @@ package pg
 
 import (
 	"context"
-	"strings"
+	"io"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -29,8 +29,8 @@ type IsZeroer interface {
 
 type Columnar interface {
 	IsZeroer
-	encodeColumn(b *strings.Builder)
-	encodeColumnIdentifier(b *strings.Builder)
+	encodeColumn(b ByteStringWriter)
+	encodeColumnIdentifier(b ByteStringWriter)
 	has(col string) bool
 }
 
@@ -46,17 +46,17 @@ type MultiColumnar interface {
 
 type OrderByColumnar interface {
 	IsZeroer
-	encodeOrderBy(b *strings.Builder)
+	encodeOrderBy(b ByteStringWriter)
 }
 
 type Condition interface {
 	IsZeroer
-	encodeCondition(b *strings.Builder, args *[]any)
+	encodeCondition(b ByteStringWriter, args *[]any)
 }
 
 type Queryable interface {
 	IsZeroer
-	encodeQuery(b *strings.Builder, args *[]any)
+	encodeQuery(b ByteStringWriter, args *[]any)
 }
 
 type conn interface {
@@ -71,4 +71,16 @@ type RawData interface {
 	Queryable
 	Alias(alias string) RawData
 	Column(path ...string) AliasedColumnar
+}
+
+type ByteStringWriter interface {
+	io.Writer
+	io.ByteWriter
+	io.StringWriter
+	Grow(n int)
+}
+
+type RowInserter interface {
+	Value(column string, value any) RowInserter
+	Exec(ctx context.Context) (err error)
 }

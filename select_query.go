@@ -42,7 +42,7 @@ func (q *SelectQuery) String() string {
 	return b.String()
 }
 
-func (q *SelectQuery) encodeQuery(b *strings.Builder, args *[]any) {
+func (q *SelectQuery) encodeQuery(b ByteStringWriter, args *[]any) {
 	b.Grow(300)
 
 	if q.Select != nil && !q.Select.IsZero() {

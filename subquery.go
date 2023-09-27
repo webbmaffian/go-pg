@@ -1,7 +1,5 @@
 package pg
 
-import "strings"
-
 var _ Queryable = SubquerySource{}
 
 func Subquery(alias string, query SelectQuery) SubquerySource {
@@ -24,7 +22,7 @@ func (t SubquerySource) Column(path ...string) AliasedColumnar {
 	}
 }
 
-func (t SubquerySource) encodeQuery(b *strings.Builder, args *[]any) {
+func (t SubquerySource) encodeQuery(b ByteStringWriter, args *[]any) {
 	b.WriteByte('(')
 	t.query.encodeQuery(b, args)
 	b.WriteByte(')')
@@ -51,7 +49,7 @@ func (c subqueryColumn) has(column string) bool {
 	return c.alias == column
 }
 
-func (c subqueryColumn) encodeColumn(b *strings.Builder) {
+func (c subqueryColumn) encodeColumn(b ByteStringWriter) {
 	c.encode(b)
 
 	if c.alias != "" {
@@ -60,7 +58,7 @@ func (c subqueryColumn) encodeColumn(b *strings.Builder) {
 	}
 }
 
-func (c subqueryColumn) encodeColumnIdentifier(b *strings.Builder) {
+func (c subqueryColumn) encodeColumnIdentifier(b ByteStringWriter) {
 	if c.alias != "" {
 		writeIdentifier(b, c.alias)
 	} else {
@@ -68,7 +66,7 @@ func (c subqueryColumn) encodeColumnIdentifier(b *strings.Builder) {
 	}
 }
 
-func (c subqueryColumn) encode(b *strings.Builder) {
+func (c subqueryColumn) encode(b ByteStringWriter) {
 	l := len(c.path)
 
 	if l > 1 {
