@@ -62,7 +62,7 @@ func (r *rowInserter) Exec(ctx context.Context) (err error) {
 		}
 
 		b.WriteByte('$')
-		b.Write(strconv.AppendInt(b.AvailableBuffer(), int64(i), 10))
+		b.Write(strconv.AppendInt(b.AvailableBuffer(), int64(i+1), 10))
 	}
 
 	b.WriteByte(')')
