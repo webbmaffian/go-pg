@@ -39,7 +39,53 @@ func (r *rowInserter) Value(column string, value any) RowInserter {
 func (r *rowInserter) Exec(ctx context.Context) (err error) {
 	var b bytes.Buffer
 	b.Grow(200)
+	r.buildQuery(&b)
+	queryString := b2s(b.Bytes())
+	_, err = r.db.Exec(ctx, queryString, r.values...)
 
+	if err != nil {
+		err = QueryError{
+			err:   err.Error(),
+			query: queryString,
+			args:  r.values,
+		}
+	}
+
+	return
+}
+
+func (r *rowInserter) ExecAndReturn(ctx context.Context, column string, bind any) (err error) {
+	var b bytes.Buffer
+	b.Grow(200)
+	r.buildQuery(&b)
+
+	b.WriteByte('\n')
+	b.WriteString("RETURNING ")
+	b.WriteByte('"')
+	b.WriteString(column)
+	b.WriteByte('"')
+
+	queryString := b2s(b.Bytes())
+	rows, err := r.db.Query(ctx, queryString, r.values...)
+
+	if err != nil {
+		return QueryError{
+			err:   err.Error(),
+			query: queryString,
+			args:  r.values,
+		}
+	}
+
+	defer rows.Close()
+
+	if rows.Next() {
+		return rows.Scan(bind)
+	}
+
+	return
+}
+
+func (r *rowInserter) buildQuery(b *bytes.Buffer) {
 	b.WriteString("INSERT INTO ")
 	b.WriteString(r.table.identifier.Sanitize())
 	b.WriteString(" (")
@@ -68,19 +114,6 @@ func (r *rowInserter) Exec(ctx context.Context) (err error) {
 	b.WriteByte(')')
 
 	if r.onConflict != nil {
-		r.onConflict.encodeConflictHandler(&b, r.columns, &r.values)
+		r.onConflict.encodeConflictHandler(b, r.columns, &r.values)
 	}
-
-	queryString := b2s(b.Bytes())
-	_, err = r.db.Exec(ctx, queryString, r.values...)
-
-	if err != nil {
-		err = QueryError{
-			err:   err.Error(),
-			query: queryString,
-			args:  r.values,
-		}
-	}
-
-	return
 }

@@ -83,4 +83,5 @@ type ByteStringWriter interface {
 type RowInserter interface {
 	Value(column string, value any) RowInserter
 	Exec(ctx context.Context) (err error)
+	ExecAndReturn(ctx context.Context, column string, bind any) (err error)
 }
