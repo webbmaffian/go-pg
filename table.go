@@ -85,7 +85,7 @@ func (t TableSource) Insert(ctx context.Context, src any, onConflict ...Conflict
 	return Insert(ctx, t.db, t, src, onConflict...)
 }
 
-func (t TableSource) InsertRow(ctx context.Context, onConflict ...ConflictAction) RowInserter {
+func (t TableSource) InsertRow(onConflict ...ConflictAction) RowInserter {
 	return InsertRow(t.db, t, onConflict...)
 }
 
