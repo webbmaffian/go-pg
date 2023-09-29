@@ -101,10 +101,19 @@ func (q *SelectQuery) encodeQuery(b ByteStringWriter, args *[]any) {
 	}
 }
 
-func (q *SelectQuery) run(ctx context.Context, db conn) (err error) {
+func (q *SelectQuery) run(ctx context.Context, dbConn ...conn) (err error) {
 	var b strings.Builder
 	args := make([]any, 0, 5)
 	q.encodeQuery(&b, &args)
+	var db conn
+
+	if dbConn != nil {
+		db = dbConn[0]
+	} else if fromConn, ok := q.From.(TableSource); ok {
+		db = fromConn.db
+	} else {
+		return errors.New("missing db connection")
+	}
 
 	q.result, err = db.Query(ctx, q.String(), args...)
 
@@ -119,8 +128,8 @@ func (q *SelectQuery) run(ctx context.Context, db conn) (err error) {
 	return
 }
 
-func (q *SelectQuery) Run(ctx context.Context, db conn) error {
-	return q.run(ctx, db)
+func (q *SelectQuery) Run(ctx context.Context, db ...conn) error {
+	return q.run(ctx, db...)
 }
 
 func (q *SelectQuery) Next() bool {
@@ -140,7 +149,7 @@ func (q *SelectQuery) Next() bool {
 
 func (q *SelectQuery) Scan(dest ...any) error {
 	if q.result == nil {
-		return errors.New("Result is closed")
+		return errors.New("result is closed")
 	}
 
 	return q.result.Scan(dest...)
