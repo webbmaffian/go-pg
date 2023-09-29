@@ -6,11 +6,9 @@ import (
 	"errors"
 	"io"
 	"reflect"
-
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func Select(ctx context.Context, db *pgxpool.Pool, dest any, q SelectQuery, options ...SelectOptions) (err error) {
+func Select(ctx context.Context, db conn, dest any, q SelectQuery, options ...SelectOptions) (err error) {
 	var opt SelectOptions
 
 	if len(options) != 0 {
@@ -45,7 +43,7 @@ func Select(ctx context.Context, db *pgxpool.Pool, dest any, q SelectQuery, opti
 	return
 }
 
-func selectOneIntoStruct(ctx context.Context, val reflect.Value, q *SelectQuery, db *pgxpool.Pool) (err error) {
+func selectOneIntoStruct(ctx context.Context, val reflect.Value, q *SelectQuery, db conn) (err error) {
 	var selectedFields columns
 
 	elem := val.Elem()
@@ -108,7 +106,7 @@ func selectOneIntoStruct(ctx context.Context, val reflect.Value, q *SelectQuery,
 	return
 }
 
-func selectIntoSlice(ctx context.Context, dest reflect.Value, q *SelectQuery, db *pgxpool.Pool) (err error) {
+func selectIntoSlice(ctx context.Context, dest reflect.Value, q *SelectQuery, db conn) (err error) {
 	destVal := dest.Elem()
 	val := reflect.New(destVal.Type().Elem())
 	elem := val.Elem()
@@ -156,7 +154,7 @@ func selectIntoSlice(ctx context.Context, dest reflect.Value, q *SelectQuery, db
 	return
 }
 
-func selectIntoWriter(ctx context.Context, w io.Writer, q *SelectQuery, opt SelectOptions, db *pgxpool.Pool) (err error) {
+func selectIntoWriter(ctx context.Context, w io.Writer, q *SelectQuery, opt SelectOptions, db conn) (err error) {
 	err = q.run(ctx, db)
 
 	if err != nil {

@@ -144,7 +144,7 @@ func (t *TableSource) JsonColumn(path ...string) AliasedColumnar {
 	}
 }
 
-func TruncateTable(ctx context.Context, db *pgxpool.Pool, table pgx.Identifier) (err error) {
+func TruncateTable(ctx context.Context, db conn, table pgx.Identifier) (err error) {
 	var b strings.Builder
 	b.Grow(64)
 
@@ -156,7 +156,7 @@ func TruncateTable(ctx context.Context, db *pgxpool.Pool, table pgx.Identifier) 
 	return
 }
 
-func DropTable(ctx context.Context, db *pgxpool.Pool, table pgx.Identifier) (err error) {
+func DropTable(ctx context.Context, db conn, table pgx.Identifier) (err error) {
 	var b strings.Builder
 	b.Grow(64)
 

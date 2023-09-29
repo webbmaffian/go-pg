@@ -81,36 +81,40 @@ func (tx Tx) QueryRow(ctx context.Context, sql string, args ...any) pgx.Row {
 	return tx.db.QueryRow(ctx, sql, args...)
 }
 
-func (tx Tx) Select(ctx context.Context, t TableSource, dest any, q SelectQuery, options ...SelectOptions) error {
-	return Select(ctx, t.db, dest, q, options...)
+func (tx Tx) Select(ctx context.Context, dest any, q SelectQuery, options ...SelectOptions) error {
+	return Select(ctx, tx.db, dest, q, options...)
 }
 
-func (tx Tx) SelectTotal(ctx context.Context, t TableSource, dest *int, q SelectQuery) error {
-	return SelectTotal(ctx, t.db, dest, q)
+func (tx Tx) SelectTotal(ctx context.Context, dest *int, q SelectQuery) error {
+	return SelectTotal(ctx, tx.db, dest, q)
+}
+
+func (tx Tx) SelectValue(ctx context.Context, dest any, q SelectQuery) error {
+	return SelectValue(ctx, tx.db, dest, q)
 }
 
 func (tx Tx) Iterate(ctx context.Context, t TableSource, q SelectQuery, iterator func(values []any) error) error {
-	return Iterate(ctx, t.db, q, iterator)
+	return Iterate(ctx, tx.db, q, iterator)
 }
 
 func (tx Tx) IterateRaw(ctx context.Context, t TableSource, q SelectQuery, iterator func(values [][]byte) error) error {
-	return IterateRaw(ctx, t.db, q, iterator)
+	return IterateRaw(ctx, tx.db, q, iterator)
 }
 
 func (tx Tx) Insert(ctx context.Context, t TableSource, src any, onConflict ...ConflictAction) error {
-	return Insert(ctx, t.db, t, src, onConflict...)
+	return Insert(ctx, tx.db, t, src, onConflict...)
 }
 
 func (tx Tx) InsertRow(t TableSource, onConflict ...ConflictAction) RowInserter {
-	return InsertRow(t.db, t, onConflict...)
+	return InsertRow(tx.db, t, onConflict...)
 }
 
 func (tx Tx) Update(ctx context.Context, t TableSource, src any, condition Condition) error {
-	return Update(ctx, t.db, t, src, condition)
+	return Update(ctx, tx.db, t, src, condition)
 }
 
 func (tx Tx) Delete(ctx context.Context, t TableSource, condition Condition) error {
-	return Delete(ctx, t.db, t, condition)
+	return Delete(ctx, tx.db, t, condition)
 }
 
 func (tx Tx) CopyFrom(ctx context.Context, t TableSource, columnNames []string, rowSrc pgx.CopyFromSource) (int64, error) {
@@ -118,5 +122,5 @@ func (tx Tx) CopyFrom(ctx context.Context, t TableSource, columnNames []string, 
 }
 
 func (tx Tx) Truncate(ctx context.Context, t TableSource) (err error) {
-	return TruncateTable(ctx, t.db, t.identifier)
+	return TruncateTable(ctx, tx.db, t.identifier)
 }

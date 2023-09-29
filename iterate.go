@@ -3,11 +3,9 @@ package pg
 import (
 	"context"
 	"errors"
-
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-func Iterate(ctx context.Context, db *pgxpool.Pool, q SelectQuery, iterator func(values []any) error) (err error) {
+func Iterate(ctx context.Context, db conn, q SelectQuery, iterator func(values []any) error) (err error) {
 	if q.Select == nil {
 		return errors.New("no columns to select")
 	}
@@ -35,7 +33,7 @@ func Iterate(ctx context.Context, db *pgxpool.Pool, q SelectQuery, iterator func
 	return
 }
 
-func IterateRaw(ctx context.Context, db *pgxpool.Pool, q SelectQuery, iterator func(values [][]byte) error) (err error) {
+func IterateRaw(ctx context.Context, db conn, q SelectQuery, iterator func(values [][]byte) error) (err error) {
 	if q.Select == nil {
 		return errors.New("no columns to select")
 	}

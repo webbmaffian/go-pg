@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 var PartitionName = func(tableName pgx.Identifier, partition string) pgx.Identifier {
@@ -18,7 +17,7 @@ var PartitionName = func(tableName pgx.Identifier, partition string) pgx.Identif
 	return partitionName
 }
 
-func CreatePartition(ctx context.Context, db *pgxpool.Pool, table pgx.Identifier, partition pgx.Identifier, value string) (err error) {
+func CreatePartition(ctx context.Context, db conn, table pgx.Identifier, partition pgx.Identifier, value string) (err error) {
 	var b strings.Builder
 	b.Grow(64)
 	args := make([]any, 0, 1)
