@@ -3,10 +3,18 @@ package pg
 import (
 	"context"
 	"errors"
+	"strings"
 
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
+)
+
+type LockMode byte
+
+const (
+	SharedLock    LockMode = iota // Others can read, but not write
+	ExclusiveLock                 // Other can neither read nor write
 )
 
 var ErrReleased = errors.New("connection released")
@@ -123,4 +131,29 @@ func (tx Tx) CopyFrom(ctx context.Context, t TableSource, columnNames []string, 
 
 func (tx Tx) Truncate(ctx context.Context, t TableSource) (err error) {
 	return TruncateTable(ctx, tx.db, t.identifier)
+}
+
+func (tx Tx) LockTable(ctx context.Context, t TableSource, lockMode ...LockMode) (err error) {
+	var mode LockMode = SharedLock
+	var b strings.Builder
+	b.Grow(64)
+
+	if lockMode != nil {
+		mode = lockMode[0]
+	}
+
+	b.WriteString("LOCK TABLE ")
+	b.WriteString(t.identifier.Sanitize())
+	b.WriteString(" IN ")
+
+	switch mode {
+	case SharedLock:
+		b.WriteString("SHARE MODE")
+
+	case ExclusiveLock:
+		b.WriteString("EXCLUSIVE MODE")
+	}
+
+	_, err = tx.db.Exec(ctx, b.String())
+	return
 }
