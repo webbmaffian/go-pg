@@ -59,6 +59,12 @@ type Queryable interface {
 	encodeQuery(b ByteStringWriter, args *[]any)
 }
 
+type AliasedQueryable interface {
+	Queryable
+	Alias() string
+	Query() Queryable
+}
+
 type conn interface {
 	Exec(ctx context.Context, sql string, arguments ...any) (pgconn.CommandTag, error)
 	Query(ctx context.Context, sql string, args ...any) (pgx.Rows, error)
