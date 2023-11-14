@@ -4,12 +4,12 @@ import (
 	"context"
 )
 
-func SelectTotal(ctx context.Context, db conn, dest *int, q SelectQuery) (err error) {
+func SelectTotal(ctx context.Context, db conn, dest *int, q SelectQuery, distinctColumn ...any) (err error) {
 	q.GroupBy = nil
 	q.Limit = 0
 	q.Offset = 0
 	q.OrderBy = nil
-	q.Select = Count().Alias("count")
+	q.Select = Count(distinctColumn...).Alias("count")
 
 	err = q.run(ctx, db)
 

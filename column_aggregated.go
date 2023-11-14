@@ -44,7 +44,7 @@ func Count(distinctColumn ...any) AliasedColumnar {
 	return aggregatedColumn{
 		function: "COUNT",
 		argsCallback: func(b ByteStringWriter) {
-			if len(distinctColumn) == 0 {
+			if len(distinctColumn) == 0 || distinctColumn[0] == nil {
 				b.WriteString("*")
 			} else {
 				var col Columnar

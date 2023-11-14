@@ -26,8 +26,9 @@ type SelectQuery struct {
 }
 
 type SelectOptions struct {
-	BeforeMarshal func(data *map[string]any) error
-	AfterMarshal  func(data *map[string]any) error
+	BeforeMarshal      func(data *map[string]any) error
+	AfterMarshal       func(data *map[string]any) error
+	CountDistictColumn Columnar
 }
 
 func (q SelectQuery) IsZero() bool {
