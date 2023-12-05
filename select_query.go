@@ -2,7 +2,6 @@ package pg
 
 import (
 	"context"
-	"errors"
 	"strings"
 
 	"github.com/jackc/pgx/v5"
@@ -112,7 +111,7 @@ func (q *SelectQuery) run(ctx context.Context, dbConn ...conn) (err error) {
 	} else if fromConn, ok := q.From.(TableSource); ok {
 		db = fromConn.db
 	} else {
-		return errors.New("missing db connection")
+		return ErrNoConnection
 	}
 
 	q.result, err = db.Query(ctx, q.String(), args...)
@@ -149,7 +148,7 @@ func (q *SelectQuery) Next() bool {
 
 func (q *SelectQuery) Scan(dest ...any) error {
 	if q.result == nil {
-		return errors.New("result is closed")
+		return ErrResultClosed
 	}
 
 	return q.result.Scan(dest...)

@@ -3,30 +3,29 @@ package pg
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"io"
 	"reflect"
 )
 
-func Select(ctx context.Context, db conn, dest any, q SelectQuery, options ...SelectOptions) (err error) {
+func Select(ctx context.Context, db conn, dst any, q SelectQuery, options ...SelectOptions) (err error) {
 	var opt SelectOptions
 
 	if len(options) != 0 {
 		opt = options[0]
 	}
 
-	switch d := dest.(type) {
+	switch d := dst.(type) {
 	case io.Writer:
 		return selectIntoWriter(ctx, d, &q, opt, db)
 
 	case *map[string]any:
-		return errors.New("Not supported yet")
+		return ErrNotSupported
 	}
 
-	destPtr := reflect.ValueOf(dest)
+	destPtr := reflect.ValueOf(dst)
 
 	if destPtr.Kind() != reflect.Pointer {
-		return errors.New("Destination must be a pointer")
+		return ErrNoPointer
 	}
 
 	destVal := destPtr.Elem()
@@ -37,7 +36,7 @@ func Select(ctx context.Context, db conn, dest any, q SelectQuery, options ...Se
 	case reflect.Struct:
 		err = selectOneIntoStruct(ctx, destPtr, &q, db)
 	default:
-		return errors.New("Invalid destination")
+		return ErrInvalidDst
 	}
 
 	return
@@ -100,7 +99,7 @@ func selectOneIntoStruct(ctx context.Context, val reflect.Value, q *SelectQuery,
 	}
 
 	if !found {
-		err = errors.New("Row not found")
+		err = ErrNotFound
 	}
 
 	return

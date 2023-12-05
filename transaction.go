@@ -2,7 +2,6 @@ package pg
 
 import (
 	"context"
-	"errors"
 	"strings"
 
 	"github.com/jackc/pgx/v5"
@@ -16,8 +15,6 @@ const (
 	SharedLock    LockMode = iota // Others can read, but not write
 	ExclusiveLock                 // Other can neither read nor write
 )
-
-var ErrReleased = errors.New("connection released")
 
 func Transaction(ctx context.Context, pool *pgxpool.Pool, cb func(context.Context, Tx) error) (err error) {
 	conn, err := pool.Acquire(ctx)

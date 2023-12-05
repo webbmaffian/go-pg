@@ -2,12 +2,11 @@ package pg
 
 import (
 	"context"
-	"errors"
 )
 
 func Iterate(ctx context.Context, db conn, q SelectQuery, iterator func(values []any) error) (err error) {
 	if q.Select == nil {
-		return errors.New("no columns to select")
+		return ErrNoColumns
 	}
 
 	err = q.run(ctx, db)
@@ -35,7 +34,7 @@ func Iterate(ctx context.Context, db conn, q SelectQuery, iterator func(values [
 
 func IterateRaw(ctx context.Context, db conn, q SelectQuery, iterator func(values [][]byte) error) (err error) {
 	if q.Select == nil {
-		return errors.New("no columns to select")
+		return ErrNoColumns
 	}
 
 	err = q.run(ctx, db)
