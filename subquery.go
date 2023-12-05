@@ -22,6 +22,14 @@ func (t SubquerySource) Column(path ...string) AliasedColumnar {
 	}
 }
 
+func (t SubquerySource) Alias() string {
+	return t.alias
+}
+
+func (t SubquerySource) Query() Queryable {
+	return &t.query
+}
+
 func (t SubquerySource) encodeQuery(b ByteStringWriter, args *[]any) {
 	b.WriteByte('(')
 	t.query.encodeQuery(b, args)

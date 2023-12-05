@@ -2,6 +2,7 @@ package pg
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	"github.com/jackc/pgx/v5"
@@ -15,6 +16,7 @@ type SelectQuery struct {
 	GroupBy Columnar
 	Having  Condition
 	OrderBy OrderByColumnar
+	With    AliasedQueryable
 	Limit   int
 	Offset  int
 
@@ -23,8 +25,9 @@ type SelectQuery struct {
 }
 
 type SelectOptions struct {
-	BeforeMarshal func(data *map[string]any) error
-	AfterMarshal  func(data *map[string]any) error
+	BeforeMarshal      func(data *map[string]any) error
+	AfterMarshal       func(data *map[string]any) error
+	CountDistictColumn Columnar
 }
 
 func (q SelectQuery) IsZero() bool {
@@ -43,6 +46,14 @@ func (q *SelectQuery) String() string {
 
 func (q *SelectQuery) encodeQuery(b ByteStringWriter, args *[]any) {
 	b.Grow(300)
+
+	if q.With != nil && !q.With.IsZero() {
+		b.WriteString(fmt.Sprintf(`WITH "%s" AS (`, q.With.Alias()))
+		b.WriteByte('\n')
+		q.With.Query().encodeQuery(b, args)
+		b.WriteString(")")
+		b.WriteByte('\n')
+	}
 
 	if q.Select != nil && !q.Select.IsZero() {
 		b.WriteString("SELECT ")
