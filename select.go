@@ -106,12 +106,18 @@ func selectOneIntoStruct(ctx context.Context, val reflect.Value, q *SelectQuery,
 }
 
 func selectIntoSlice(ctx context.Context, dest reflect.Value, q *SelectQuery, db conn) (err error) {
+	var selectedFields columns
+
 	destVal := dest.Elem()
 	val := reflect.New(destVal.Type().Elem())
 	elem := val.Elem()
 	typ := elem.Type()
 	numFields := elem.NumField()
 	destProps := make([]any, 0, numFields)
+
+	if q.Select == nil {
+		selectedFields = make(columns, 0, 10)
+	}
 
 	for i := 0; i < numFields; i++ {
 		f := elem.Field(i)
@@ -128,8 +134,13 @@ func selectIntoSlice(ctx context.Context, dest reflect.Value, q *SelectQuery, db
 		}
 
 		if q.Select == nil || q.Select.has(col) {
+			selectedFields = append(selectedFields, Column(col))
 			destProps = append(destProps, f.Addr().Interface())
 		}
+	}
+
+	if q.Select == nil {
+		q.Select = selectedFields
 	}
 
 	err = q.run(ctx, db)
