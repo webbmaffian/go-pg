@@ -12,6 +12,8 @@ func InsertRow(db conn, table TableSource, onConflict ...ConflictAction) RowInse
 		table: table,
 	}
 
+	r.buf.Grow(200)
+
 	if onConflict != nil {
 		r.onConflict = onConflict[0]
 	}
@@ -27,6 +29,13 @@ type rowInserter struct {
 	db         conn
 	table      TableSource
 	onConflict ConflictAction
+	buf        bytes.Buffer
+}
+
+func (r *rowInserter) Reset() {
+	r.columns = r.columns[:0]
+	r.values = r.values[:0]
+	r.buf.Reset()
 }
 
 func (r *rowInserter) Value(column string, value any) RowInserter {
@@ -37,10 +46,8 @@ func (r *rowInserter) Value(column string, value any) RowInserter {
 }
 
 func (r *rowInserter) Exec(ctx context.Context) (err error) {
-	var b bytes.Buffer
-	b.Grow(200)
-	r.buildQuery(&b)
-	queryString := b2s(b.Bytes())
+	r.buildQuery(&r.buf)
+	queryString := b2s(r.buf.Bytes())
 	_, err = r.db.Exec(ctx, queryString, r.values...)
 
 	if err != nil {
@@ -51,21 +58,21 @@ func (r *rowInserter) Exec(ctx context.Context) (err error) {
 		}
 	}
 
+	r.Reset()
+
 	return
 }
 
 func (r *rowInserter) ExecAndReturn(ctx context.Context, column string, bind any) (err error) {
-	var b bytes.Buffer
-	b.Grow(200)
-	r.buildQuery(&b)
+	r.buildQuery(&r.buf)
 
-	b.WriteByte('\n')
-	b.WriteString("RETURNING ")
-	b.WriteByte('"')
-	b.WriteString(column)
-	b.WriteByte('"')
+	r.buf.WriteByte('\n')
+	r.buf.WriteString("RETURNING ")
+	r.buf.WriteByte('"')
+	r.buf.WriteString(column)
+	r.buf.WriteByte('"')
 
-	queryString := b2s(b.Bytes())
+	queryString := b2s(r.buf.Bytes())
 	rows, err := r.db.Query(ctx, queryString, r.values...)
 
 	if err != nil {
@@ -75,6 +82,8 @@ func (r *rowInserter) ExecAndReturn(ctx context.Context, column string, bind any
 			args:  r.values,
 		}
 	}
+
+	r.Reset()
 
 	defer rows.Close()
 
