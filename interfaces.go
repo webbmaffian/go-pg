@@ -27,6 +27,10 @@ type IsZeroer interface {
 	IsZero() bool
 }
 
+type Nullable interface {
+	IsNullable() bool
+}
+
 type Columnar interface {
 	IsZeroer
 	encodeColumn(b ByteStringWriter)

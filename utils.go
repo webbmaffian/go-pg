@@ -23,6 +23,10 @@ func fieldName(fld reflect.StructField) string {
 
 func skipField(i any) bool {
 	switch v := i.(type) {
+	case Nullable:
+		if v.IsNullable() {
+			return false
+		}
 	case IsZeroer:
 		if v.IsZero() {
 			return true
