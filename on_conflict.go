@@ -18,6 +18,7 @@ func OnConflict(conflictingColumns ...any) ConflictTarget {
 type onConflict struct {
 	conflictingColumns Columnar
 	targetCondition    Condition
+	skip               bool
 }
 
 func (c onConflict) Update(where ...Condition) ConflictAction {
@@ -29,11 +30,12 @@ func (c onConflict) Update(where ...Condition) ConflictAction {
 }
 
 func (c onConflict) DoNothing() ConflictAction {
+	c.skip = true
 	return c
 }
 
 func (c onConflict) encodeConflictHandler(b ByteStringWriter, columns []string, args *[]any) (err error) {
-	if len(columns) == 0 {
+	if c.skip || len(columns) == 0 {
 		b.WriteByte('\n')
 		b.WriteString("ON CONFLICT DO NOTHING")
 		return
