@@ -144,6 +144,13 @@ func (t *TableSource) JsonColumn(path ...string) AliasedColumnar {
 	}
 }
 
+func (t *TableSource) JsonColumnText(path ...string) AliasedColumnar {
+	return jsonColumnText{
+		path:  path,
+		table: t,
+	}
+}
+
 func TruncateTable(ctx context.Context, db conn, table pgx.Identifier) (err error) {
 	var b strings.Builder
 	b.Grow(64)
