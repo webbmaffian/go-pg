@@ -21,6 +21,10 @@ type TableSource struct {
 	originalIdentifier pgx.Identifier
 }
 
+func (t TableSource) String() string {
+	return t.identifier.Sanitize()
+}
+
 func (t TableSource) IsZero() bool {
 	return t.identifier == nil
 }
