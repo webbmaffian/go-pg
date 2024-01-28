@@ -25,6 +25,10 @@ func (t TableSource) String() string {
 	return t.identifier.Sanitize()
 }
 
+func (t TableSource) DB() *pgxpool.Pool {
+	return t.db
+}
+
 func (t TableSource) IsZero() bool {
 	return t.identifier == nil
 }
