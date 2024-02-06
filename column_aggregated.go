@@ -169,7 +169,7 @@ func Coalesce(columns ...any) AliasedColumnar {
 				case Columnar:
 					col = v
 				case string:
-					col = Raw(v)
+					col = Column(v)
 				case int:
 					col = Raw(strconv.Itoa(v))
 				}
