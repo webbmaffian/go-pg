@@ -160,7 +160,7 @@ func Aggregate(aggFunc string, column any) AliasedColumnar {
 
 func Coalesce(columns ...any) AliasedColumnar {
 	return aggregatedColumn{
-		function: "ARRAY_AGG",
+		function: "COALESCE",
 		argsCallback: func(b ByteStringWriter) {
 			for i := range columns {
 				var col Columnar
