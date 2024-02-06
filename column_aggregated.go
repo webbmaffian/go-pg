@@ -1,5 +1,7 @@
 package pg
 
+import "strconv"
+
 type aggregatedColumn struct {
 	function     string
 	argsCallback func(b ByteStringWriter)
@@ -153,5 +155,31 @@ func Aggregate(aggFunc string, column any) AliasedColumnar {
 	return aggregatedColumn{
 		function:     aggFunc,
 		argsCallback: col.encodeColumnIdentifier,
+	}
+}
+
+func Coalesce(columns ...any) AliasedColumnar {
+	return aggregatedColumn{
+		function: "ARRAY_AGG",
+		argsCallback: func(b ByteStringWriter) {
+			for i := range columns {
+				var col Columnar
+
+				switch v := columns[i].(type) {
+				case Columnar:
+					col = v
+				case string:
+					col = Raw(v)
+				case int:
+					col = Raw(strconv.Itoa(v))
+				}
+
+				if i != 0 {
+					b.WriteString(", ")
+				}
+
+				col.encodeColumnIdentifier(b)
+			}
+		},
 	}
 }
