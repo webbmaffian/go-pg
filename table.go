@@ -113,6 +113,10 @@ func (t TableSource) Partition(partition string) TableSource {
 	}
 }
 
+func (t TableSource) Exists(ctx context.Context, condition Condition) (bool, error) {
+	return Exists(ctx, t.db, t, condition)
+}
+
 func (t TableSource) Truncate(ctx context.Context) (err error) {
 	return TruncateTable(ctx, t.db, t.identifier)
 }

@@ -130,6 +130,10 @@ func (tx Tx) Truncate(ctx context.Context, t TableSource) (err error) {
 	return TruncateTable(ctx, tx.db, t.identifier)
 }
 
+func (tx Tx) Exists(ctx context.Context, t TableSource, condition Condition) (bool, error) {
+	return Exists(ctx, tx, t, condition)
+}
+
 func (tx Tx) LockTable(ctx context.Context, t TableSource, lockMode ...LockMode) (err error) {
 	var mode LockMode = SharedLock
 	var b strings.Builder
