@@ -178,7 +178,7 @@ func Coalesce(columns ...any) AliasedColumnar {
 					b.WriteString(", ")
 				}
 
-				col.encodeColumnIdentifier(b)
+				col.encodeColumn(b)
 			}
 		},
 	}
