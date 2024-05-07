@@ -6,7 +6,7 @@ type ConflictTarget interface {
 }
 
 type ConflictAction interface {
-	encodeConflictHandler(b ByteStringWriter, columns []string, args *[]any) error
+	encodeConflictHandler(b ByteStringWriter, columns []string, skipUpdate []bool, args *[]any) error
 }
 
 func OnConflict(conflictingColumns ...any) ConflictTarget {
@@ -34,7 +34,7 @@ func (c onConflict) DoNothing() ConflictAction {
 	return c
 }
 
-func (c onConflict) encodeConflictHandler(b ByteStringWriter, columns []string, args *[]any) (err error) {
+func (c onConflict) encodeConflictHandler(b ByteStringWriter, columns []string, skipUpdate []bool, args *[]any) (err error) {
 	if c.skip || len(columns) == 0 {
 		b.WriteByte('\n')
 		b.WriteString("ON CONFLICT DO NOTHING")
@@ -44,13 +44,17 @@ func (c onConflict) encodeConflictHandler(b ByteStringWriter, columns []string, 
 	b.WriteByte('\n')
 	b.WriteString("ON CONFLICT (")
 	c.conflictingColumns.encodeColumnIdentifier(b)
-	b.WriteString(") DO UPDATE SET ")
 
-	first := true
+	var written bool
 
-	for _, column := range columns {
-		if first {
-			first = false
+	for i, column := range columns {
+		if skipUpdate != nil && skipUpdate[i] {
+			continue
+		}
+
+		if !written {
+			b.WriteString(") DO UPDATE SET ")
+			written = true
 		} else {
 			b.WriteString(", ")
 		}
@@ -60,7 +64,9 @@ func (c onConflict) encodeConflictHandler(b ByteStringWriter, columns []string, 
 		writeIdentifier(b, column)
 	}
 
-	if c.targetCondition != nil {
+	if !written {
+		b.WriteString(") DO NOTHING")
+	} else if c.targetCondition != nil {
 		b.WriteString(" WHERE ")
 		c.targetCondition.encodeCondition(b, args)
 	}

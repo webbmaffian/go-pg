@@ -26,6 +26,7 @@ var _ RowInserter = (*rowInserter)(nil)
 type rowInserter struct {
 	columns    []string
 	values     []any
+	skipUpdate []bool
 	db         conn
 	table      TableSource
 	onConflict ConflictAction
@@ -35,12 +36,19 @@ type rowInserter struct {
 func (r *rowInserter) Reset() {
 	r.columns = r.columns[:0]
 	r.values = r.values[:0]
+	r.skipUpdate = r.skipUpdate[:0]
 	r.buf.Reset()
 }
 
-func (r *rowInserter) Value(column string, value any) RowInserter {
+func (r *rowInserter) Value(column string, value any, skipUpdate ...bool) RowInserter {
 	r.columns = append(r.columns, column)
 	r.values = append(r.values, value)
+
+	if len(skipUpdate) > 0 {
+		r.skipUpdate = append(r.skipUpdate, skipUpdate[0])
+	} else {
+		r.skipUpdate = append(r.skipUpdate, false)
+	}
 
 	return r
 }
@@ -123,6 +131,6 @@ func (r *rowInserter) buildQuery(b *bytes.Buffer) {
 	b.WriteByte(')')
 
 	if r.onConflict != nil {
-		r.onConflict.encodeConflictHandler(b, r.columns, &r.values)
+		r.onConflict.encodeConflictHandler(b, r.columns, r.skipUpdate, &r.values)
 	}
 }

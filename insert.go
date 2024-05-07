@@ -60,7 +60,7 @@ func Insert(ctx context.Context, db conn, table TableSource, src any, onConflict
 	b.WriteString(values.String())
 
 	if len(onConflict) > 0 {
-		if err = onConflict[0].encodeConflictHandler(&b, keys, &args); err != nil {
+		if err = onConflict[0].encodeConflictHandler(&b, keys, nil, &args); err != nil {
 			return
 		}
 	}
