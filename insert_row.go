@@ -55,7 +55,7 @@ func (r *rowInserter) Value(column string, value any, skipUpdate ...bool) RowIns
 
 func (r *rowInserter) Exec(ctx context.Context) (err error) {
 	r.buildQuery(&r.buf)
-	queryString := b2s(r.buf.Bytes())
+	queryString := string(r.buf.Bytes())
 	_, err = r.db.Exec(ctx, queryString, r.values...)
 
 	if err != nil {
@@ -80,7 +80,7 @@ func (r *rowInserter) ExecAndReturn(ctx context.Context, column string, bind any
 	r.buf.WriteString(column)
 	r.buf.WriteByte('"')
 
-	queryString := b2s(r.buf.Bytes())
+	queryString := string(r.buf.Bytes())
 	rows, err := r.db.Query(ctx, queryString, r.values...)
 
 	if err != nil {
