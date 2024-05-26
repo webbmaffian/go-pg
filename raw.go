@@ -85,7 +85,28 @@ func (c raw) has(col string) bool {
 }
 
 func (c raw) encodeQuery(b ByteStringWriter, args *[]any) {
-	b.WriteString(c.raw)
+	if len(c.params) == 0 {
+		b.WriteString(c.raw)
+		return
+	}
+
+	var prev int
+	str := []byte(c.raw)
+
+	for _, param := range c.params {
+		cur := bytes.IndexByte(str[prev:], '?')
+
+		if cur == -1 {
+			break
+		}
+
+		b.Write(str[prev:cur])
+		writeParam(b, args, param)
+
+		prev = cur + 1
+	}
+
+	b.Write(str[prev:])
 
 	if c.alias != "" {
 		b.WriteString(" AS ")
