@@ -103,7 +103,7 @@ func (c raw) encodeQuery(b ByteStringWriter, args *[]any) {
 		b.Write(str[prev : prev+cur])
 		writeParam(b, args, param)
 
-		prev = cur + 1
+		prev += cur + 1
 	}
 
 	b.Write(str[prev:])
