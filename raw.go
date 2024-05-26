@@ -45,7 +45,7 @@ func (c raw) encodeCondition(b ByteStringWriter, args *[]any) {
 			break
 		}
 
-		b.Write(str[prev:cur])
+		b.Write(str[prev : prev+cur])
 		writeParam(b, args, param)
 
 		prev = cur + 1
@@ -100,7 +100,7 @@ func (c raw) encodeQuery(b ByteStringWriter, args *[]any) {
 			break
 		}
 
-		b.Write(str[prev:cur])
+		b.Write(str[prev : prev+cur])
 		writeParam(b, args, param)
 
 		prev = cur + 1
