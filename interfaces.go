@@ -53,6 +53,10 @@ type OrderByColumnar interface {
 	encodeOrderBy(b ByteStringWriter)
 }
 
+type OrderByColumnarNullsLast interface {
+	OrderByColumnar
+}
+
 type Condition interface {
 	IsZeroer
 	encodeCondition(b ByteStringWriter, args *[]any)
