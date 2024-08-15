@@ -69,8 +69,30 @@ func AscNullsLast(cols ...any) OrderByColumnarNullsLast {
 	return columns
 }
 
+func AscNullsFirst(cols ...any) OrderByColumnarNullsLast {
+	if cols == nil {
+		return nil
+	}
+
+	columns := make(ascNullsFirst, len(cols))
+
+	for i := range cols {
+		switch c := cols[i].(type) {
+
+		case Columnar:
+			columns[i] = c
+
+		case string:
+			columns[i] = Column(c)
+		}
+	}
+
+	return columns
+}
+
 type asc []Columnar
 type ascNullsLast []Columnar
+type ascNullsFirst []Columnar
 
 func (o asc) IsZero() bool {
 	for i := range o {
@@ -83,6 +105,16 @@ func (o asc) IsZero() bool {
 }
 
 func (o ascNullsLast) IsZero() bool {
+	for i := range o {
+		if !o[i].IsZero() {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (o ascNullsFirst) IsZero() bool {
 	for i := range o {
 		if !o[i].IsZero() {
 			return false
@@ -119,6 +151,21 @@ func (o ascNullsLast) encodeOrderBy(b ByteStringWriter) {
 		b.WriteString(", ")
 		v.encodeColumnIdentifier(b)
 		b.WriteString(" ASC NULLS LAST")
+	}
+}
+
+func (o ascNullsFirst) encodeOrderBy(b ByteStringWriter) {
+	if len(o) == 0 {
+		return
+	}
+
+	o[0].encodeColumnIdentifier(b)
+	b.WriteString(" ASC NULLS FIRST")
+
+	for _, v := range o[1:] {
+		b.WriteString(", ")
+		v.encodeColumnIdentifier(b)
+		b.WriteString(" ASC NULLS FIRST")
 	}
 }
 
